@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import Sidebar from '../../components/Sidebar';
-import Card from '../../components/Card';
+import Sidebar from '../../components/Sidebar/Sidebar';
+import Card from '../../components/Card/Card';
 import { useSidebar } from '../../store/SidebarContext';
 import { FaTrashAlt } from 'react-icons/fa';
 import { CiCirclePlus } from "react-icons/ci";

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import Sidebar from '../../components/Sidebar'
-import Card from '../../components/Card';
+import Sidebar from '../../components/Sidebar/Sidebar'
+import Card from '../../components/Card/Card';
 
 function Evista (){
 

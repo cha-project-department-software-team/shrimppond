@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
 import { BsGrid, BsDroplet, BsBox, BsShuffle, BsInfoCircle, BsSearch, BsFileText } from 'react-icons/bs';
-import { useSidebar } from '../store/SidebarContext';
+import { useSidebar } from '../../store/SidebarContext';
 
 
 function Sidebar() {
