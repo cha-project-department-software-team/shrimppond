@@ -1,17 +1,27 @@
 import cl from 'classnames';
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
 
-function Dropdown({ items, buttonLabel }) {
+function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const scrollRef = useRef(null);
+
+    const handleScroll = (e) => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop += e.deltaY;
+        }
+    };
 
     return (
-        <div className="relative flex flex-col items-center w-80 h-80 rounded-lg">
+        <div
+            style={{ width: `${width}px`, height: `${height}px` }}
+            className="relative flex flex-col items-center rounded-lg overflow-hidden"
+        >
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cl(
-                    "bg-blue-300 p-4 w-full flex items-center justify-between font-bold text-lg",
-                    "rounded-lg tracking-wider border-4 border-transparent",
+                    "bg-white shadow-md p-1 w-full flex items-center justify-between font-bold text-lg",
+                    "rounded-lg tracking-wider border-3 border-transparent",
                     "active:border-black duration-300"
                 )}
             >
@@ -24,7 +34,11 @@ function Dropdown({ items, buttonLabel }) {
             </button>
 
             {isOpen && (
-                <div className="absolute bg-blue-300 top-20 flex flex-col items-start rounded-lg p-2 w-full">
+                <div
+                    ref={scrollRef}
+                    onWheel={handleScroll}
+                    className="absolute bg-white border border-1 border-gray-200 top-11 flex flex-col items-start rounded-lg p-1 w-full max-h-40 overflow-y-auto scroll-smooth no-scrollbar pb-4"
+                >
                     {items.map((item, i) => (
                         <div
                             key={i}
