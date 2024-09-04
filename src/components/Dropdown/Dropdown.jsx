@@ -4,12 +4,18 @@ import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
 
 function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(buttonLabel);
     const scrollRef = useRef(null);
 
     const handleScroll = (e) => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop += e.deltaY;
         }
+    };
+
+    const handleItemClick = (itemName) => {
+        setIsOpen(false);
+        setSelectedItem(itemName);
     };
 
     return (
@@ -25,7 +31,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
                     "active:border-black duration-300"
                 )}
             >
-                {buttonLabel}
+                {selectedItem}
                 {!isOpen ? (
                     <AiOutlineCaretDown className="h-8" />
                 ) : (
@@ -42,6 +48,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
                     {items.map((item, i) => (
                         <div
                             key={i}
+                            onClick = {() => handleItemClick(item.name)}
                             className={cl(
                                 "flex w-full hover:bg-gray-300 cursor-pointer rounded-r-lg",
                                 "border-l-transparent hover:border-l-white border-l-4 p-1"

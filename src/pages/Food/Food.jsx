@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar/Sidebar'
-import Modal from '../../components/Modal/Modal'
-
+import Dropdown from '../../components/Dropdown/Dropdown'
+import DropdownItems from '../../utils/constants/dropdownItems'
 function Food (){
 
     const navigate = useNavigate()
@@ -12,7 +12,7 @@ function Food (){
                 <Sidebar />
             </aside>
             <div className="grow pt-5">
-                <Modal />
+                <Dropdown items = {DropdownItems} buttonLabel = "Select a city"/>
             </div>
         </div>    
     )
