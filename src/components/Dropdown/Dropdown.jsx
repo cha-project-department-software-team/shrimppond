@@ -42,7 +42,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192, onChange }) {
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cl(
-                    "bg-white shadow-md p-1 w-full flex items-center justify-between font-bold text-lg",
+                    "bg-white shadow-xl p-1 w-full flex items-center justify-between font-bold text-lg",
                     "rounded-lg tracking-wider border-3 border-transparent",
                     "active:border-black duration-300"
                 )}
