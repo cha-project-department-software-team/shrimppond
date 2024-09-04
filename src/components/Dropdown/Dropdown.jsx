@@ -1,11 +1,12 @@
 import cl from 'classnames';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
 
 function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(buttonLabel);
     const scrollRef = useRef(null);
+    const dropdownRef = useRef(null); // Ref to track dropdown container
 
     const handleScroll = (e) => {
         if (scrollRef.current) {
@@ -14,19 +15,33 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
     };
 
     const handleItemClick = (itemName) => {
-        setIsOpen(false);
         setSelectedItem(itemName);
+        setIsOpen(false);
     };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsOpen(false); // Close dropdown if clicked outside
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div
+            ref={dropdownRef} // Attach ref to dropdown container
             style={{ width: `${width}px`, height: `${height}px` }}
             className="relative flex flex-col items-center rounded-lg overflow-hidden"
         >
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cl(
-                    "bg-white shadow-md p-1 w-full flex items-center justify-between font-bold text-lg",
+                    "bg-white shadow-xl p-1 w-full flex items-center justify-between font-bold text-lg",
                     "rounded-lg tracking-wider border-3 border-transparent",
                     "active:border-black duration-300"
                 )}
@@ -48,7 +63,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
                     {items.map((item, i) => (
                         <div
                             key={i}
-                            onClick = {() => handleItemClick(item.name)}
+                            onClick={() => handleItemClick(item.name)}
                             className={cl(
                                 "flex w-full hover:bg-gray-300 cursor-pointer rounded-r-lg",
                                 "border-l-transparent hover:border-l-white border-l-4 p-1"
