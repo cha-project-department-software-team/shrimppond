@@ -6,12 +6,15 @@ import { FaTrashAlt } from 'react-icons/fa';
 import { CiCirclePlus } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { arrayTest } from '../../utils/constants/index'
+import Modal from '../../components/Modal/Modal'
+
 
 function Dashboard() {
   const { expanded } = useSidebar();
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [isModal, setIsModal] = useState(false)
 
   const tabsBoxRef = useRef(null);
 
@@ -127,9 +130,18 @@ function Dashboard() {
           </div>
         </div>
 
-        <button className="fixed bottom-5 w-1/6 rounded-2xl h-12 bg-[#61CBF4]/[.90] cursor-pointer">
+        <button 
+          onClick={() => { setIsModal(true);
+            console.log(isModal)
+           }}
+          className="fixed bottom-5 w-1/6 rounded-2xl h-12 bg-[#61CBF4]/[.90] cursor-pointer">
           <h1>Tạo khối</h1>
         </button>
+        <Modal 
+          isModal={isModal}
+          setIsModal = {setIsModal}
+        />
+
       </div>
     </div>
   );

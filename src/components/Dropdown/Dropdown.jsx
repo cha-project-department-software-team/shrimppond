@@ -43,7 +43,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
                         <div
                             key={i}
                             className={cl(
-                                "flex w-full hover:bg-gray-100 cursor-pointer rounded-r-lg",
+                                "flex w-full hover:bg-gray-300 cursor-pointer rounded-r-lg",
                                 "border-l-transparent hover:border-l-white border-l-4 p-1"
                             )}
                         >
