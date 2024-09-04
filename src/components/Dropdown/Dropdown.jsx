@@ -1,11 +1,12 @@
 import cl from 'classnames';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
 
-function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
+function Dropdown({ items, buttonLabel, width = 192, height = 192, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(buttonLabel);
     const scrollRef = useRef(null);
+    const dropdownRef = useRef(null);
 
     const handleScroll = (e) => {
         if (scrollRef.current) {
@@ -13,13 +14,28 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
         }
     };
 
-    const handleItemClick = (itemName) => {
+    const handleItemClick = (item) => {
         setIsOpen(false);
-        setSelectedItem(itemName);
+        setSelectedItem(item.name);
+        onChange(item.name);
     };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div
+            ref={dropdownRef}
             style={{ width: `${width}px`, height: `${height}px` }}
             className="relative flex flex-col items-center rounded-lg overflow-hidden"
         >
@@ -48,7 +64,7 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192 }) {
                     {items.map((item, i) => (
                         <div
                             key={i}
-                            onClick = {() => handleItemClick(item.name)}
+                            onClick={() => handleItemClick(item)}
                             className={cl(
                                 "flex w-full hover:bg-gray-300 cursor-pointer rounded-r-lg",
                                 "border-l-transparent hover:border-l-white border-l-4 p-1"
