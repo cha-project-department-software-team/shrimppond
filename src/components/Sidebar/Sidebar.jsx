@@ -1,14 +1,12 @@
-import React, {useState, useLayoutEffect} from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useLayoutEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
 import { BsGrid, BsDroplet, BsBox, BsShuffle, BsInfoCircle, BsSearch, BsFileText } from 'react-icons/bs';
-import { useSidebar } from '../../store/SidebarContext';
 
-
-function Sidebar() {
+function Sidebar({ expanded, setExpanded }) {
   const menuItems = [
-    { name: "Dashboard", icon: <BsGrid />, lnk:  "/" },
+    { name: "Dashboard", icon: <BsGrid />, lnk: "/" },
     { name: "Thông số môi trường", icon: <BsDroplet />, lnk: "/evista" },
     { name: "Thu hoạch", icon: <BsBox />, lnk: "/harvest" },
     { name: "Chuyển ao", icon: <BsShuffle />, lnk: "/move" },
@@ -16,23 +14,26 @@ function Sidebar() {
     { name: "Truy xuất nguồn gốc", icon: <BsSearch />, lnk: "/access" },
     { name: "Thông tin trang trại", icon: <BsFileText />, lnk: "/status" },
   ];
+
   const navigate = useNavigate();
-  const { expanded, setExpanded } = useSidebar();
+  const location = useLocation(); // Thêm useLocation để lấy pathname hiện tại
+
   const [active, setActive] = useState("Dashboard");
 
+  // Theo dõi thay đổi của location.pathname và cập nhật active
   useLayoutEffect(() => {
     const currentPath = location.pathname;
     const activeItem = menuItems.find(item => item.lnk === currentPath);
     if (activeItem) {
       setActive(activeItem.name);
     }
-  }, [location.pathname])
-
+  }, [location.pathname, menuItems]); // Thêm menuItems vào dependencies để tránh warning
 
   return (
     <aside className={`h-screen ${expanded ? "w-64" : "w-[86px]"} transition-width duration-300`}>
       <nav className="h-full flex flex-col bg-[#1396c2] border-r shadow-sm">
         <div className="p-3 pl-0 flex justify-between items-center">
+          {/* Logo */}
           <img
             src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoatoi.png"
             className={`transition-all duration-300 ${expanded ? "w-16" : "w-10"}`}
@@ -44,10 +45,13 @@ function Sidebar() {
               <span className="font-bold text-black">Pond</span>
             </div>
           )}
+          {/* Button để mở rộng/thu gọn Sidebar */}
           <button onClick={() => setExpanded(prev => !prev)} className="rounded-lg text-xl">
             <TfiAlignJustify />
           </button>
         </div>
+
+        {/* Danh sách menu */}
         <ul className="flex-1 px-3 space-y-3">
           {menuItems.map((item) => (
             <li
@@ -77,6 +81,7 @@ function Sidebar() {
           ))}
         </ul>
 
+        {/* Phần Logout */}
         <div className="border-t p-3 flex justify-between items-center">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gray-400 rounded-full mr-2"></div>

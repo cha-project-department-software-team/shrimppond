@@ -7,9 +7,8 @@ function Modal({ isModal, setIsModal }) {
 
     if (!isModal) return null; // Không render Modal nếu isModal là false
 
-    // Hàm xử lý sự kiện khi nhấn vào background
     const handleCloseModal = (e) => {
-        if (e.target === e.currentTarget) { // Kiểm tra nếu nhấn vào background (vùng bao quanh modal)
+        if (e.target === e.currentTarget) {
             setIsModal(false);
         }
     };
@@ -22,7 +21,9 @@ function Modal({ isModal, setIsModal }) {
     // Hàm xử lý khi submit form
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn chặn hành vi submit mặc định
-        console.log("Tên khối đã nhập:", blockName); // Thực hiện xử lý với giá trị blockName
+        console.log("Tên khối đã nhập:", blockName);
+        // Sau khi xử lý, đặt lại giá trị ô input về chuỗi rỗng
+        setBlockName('');
         setIsModal(false); // Đóng modal sau khi xác nhận
     };
 
