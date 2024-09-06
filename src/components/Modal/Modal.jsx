@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
+import useCallApi from '../../hooks/useCallApi'; // Import hook useCallApi
 
 function Modal({ isModal, setIsModal }) { 
     const [blockName, setBlockName] = useState(''); // State để lưu giá trị của ô input
+    const callApi = useCallApi(); // Khởi tạo hook useCallApi
 
     if (!isModal) return null; // Không render Modal nếu isModal là false
 
@@ -13,18 +15,24 @@ function Modal({ isModal, setIsModal }) {
         }
     };
 
-    // Hàm xử lý khi giá trị ô input thay đổi
     const handleInputChange = (e) => {
         setBlockName(e.target.value); // Cập nhật state blockName với giá trị mới
     };
 
-    // Hàm xử lý khi submit form
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn chặn hành vi submit mặc định
-        console.log("Tên khối đã nhập:", blockName);
-        // Sau khi xử lý, đặt lại giá trị ô input về chuỗi rỗng
-        setBlockName('');
-        setIsModal(false); // Đóng modal sau khi xác nhận
+
+        // Cấu hình data cho request
+        const data = { name: blockName };
+
+        // const fetchData = useCallback(() => {
+        //     callApi(
+        //         [
+        //             'http://shrimppond.runasp.net/api/PondType'
+        //         ],
+        //     )
+        // }, [callApi])
+        
     };
 
     return (

@@ -2,9 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { CiCirclePlus } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import Card from '../Card/Card'; // Đảm bảo đường dẫn đến Card đúng
+import Card from '../Card/Card'; 
+import { useSelector } from 'react-redux';
 
-const PondSummary = ({ expanded, arrayTest }) => {
+const PondSummary = ({ arrayTest }) => {
+  const expanded = useSelector((state) => state.sidebar.expanded);
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);

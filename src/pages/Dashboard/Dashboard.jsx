@@ -4,7 +4,7 @@ import PondSummary from '../../components/PondSummary/PondSummary';
 import { arrayTest } from '../../utils/constants/index';
 import Modal from '../../components/Modal/Modal';
 import useCallApi from '../../hooks/useCallApi';
-import { useSelector } from 'react-redux'; // Import useSelector để lấy expanded từ Redux store
+import { useSelector } from 'react-redux';
 
 function Dashboard() {
   const callApi = useCallApi();
@@ -36,7 +36,6 @@ function Dashboard() {
         </div>
 
         <PondSummary
-          // Không cần truyền expanded qua PondSummary nữa
           arrayTest={arrayTest}
         />
 
