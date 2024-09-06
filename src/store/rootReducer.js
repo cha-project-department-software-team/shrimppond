@@ -1,10 +1,9 @@
-// src/store/rootReducer.js
+// store/rootReducer.js
 import { combineReducers } from 'redux';
-import sidebarReducer from './sidebarSlice';  // Import sidebarSlice
+import sidebarReducer from './sidebarSlice';  // Import slice quản lý sidebar
 
 const rootReducer = combineReducers({
-  sidebar: sidebarReducer,  // Thêm reducer sidebar vào rootReducer
-  // Các reducer khác
+  sidebar: sidebarReducer,  
 });
 
 export default rootReducer;

@@ -1,10 +1,12 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
+import React, { useLayoutEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
 import { BsGrid, BsDroplet, BsBox, BsShuffle, BsInfoCircle, BsSearch, BsFileText } from 'react-icons/bs';
+import { useSelector, useDispatch } from 'react-redux'; // Thêm useSelector và useDispatch từ Redux
+import { toggleSidebar } from '../../store/sidebarSlice'; 
 
-function Sidebar({ expanded, setExpanded }) {
+function Sidebar() {
   const menuItems = [
     { name: "Dashboard", icon: <BsGrid />, lnk: "/" },
     { name: "Thông số môi trường", icon: <BsDroplet />, lnk: "/evista" },
@@ -16,18 +18,20 @@ function Sidebar({ expanded, setExpanded }) {
   ];
 
   const navigate = useNavigate();
-  const location = useLocation(); // Thêm useLocation để lấy pathname hiện tại
+  const location = useLocation();
 
-  const [active, setActive] = useState("Dashboard");
+  const expanded = useSelector((state) => state.sidebar.expanded); // Lấy trạng thái expanded từ Redux store
+  const dispatch = useDispatch(); // Sử dụng dispatch để kích hoạt hành động
 
-  // Theo dõi thay đổi của location.pathname và cập nhật active
+  const [active, setActive] = React.useState("Dashboard");
+
   useLayoutEffect(() => {
     const currentPath = location.pathname;
     const activeItem = menuItems.find(item => item.lnk === currentPath);
     if (activeItem) {
       setActive(activeItem.name);
     }
-  }, [location.pathname, menuItems]); // Thêm menuItems vào dependencies để tránh warning
+  }, [location.pathname, menuItems]);
 
   return (
     <aside className={`h-screen ${expanded ? "w-64" : "w-[86px]"} transition-width duration-300`}>
@@ -46,7 +50,7 @@ function Sidebar({ expanded, setExpanded }) {
             </div>
           )}
           {/* Button để mở rộng/thu gọn Sidebar */}
-          <button onClick={() => setExpanded(prev => !prev)} className="rounded-lg text-xl">
+          <button onClick={() => dispatch(toggleSidebar())} className="rounded-lg text-xl">
             <TfiAlignJustify />
           </button>
         </div>

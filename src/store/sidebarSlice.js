@@ -1,21 +1,21 @@
-// src/store/sidebarSlice.js
+// store/sidebarSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const sidebarSlice = createSlice({
   name: 'sidebar',
   initialState: {
-    expanded: true,
+    expanded: true,  // Trạng thái mặc định là mở rộng
   },
   reducers: {
     toggleSidebar: (state) => {
       state.expanded = !state.expanded;
     },
-    setSidebar: (state, action) => {
+    setExpanded: (state, action) => {
       state.expanded = action.payload;
     },
   },
 });
 
-export const { toggleSidebar, setSidebar } = sidebarSlice.actions;
+export const { toggleSidebar, setExpanded } = sidebarSlice.actions;
 
 export default sidebarSlice.reducer;
