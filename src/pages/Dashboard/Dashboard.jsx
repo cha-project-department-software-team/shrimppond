@@ -6,7 +6,7 @@ import Modal from '../../components/Modal/Modal';
 import useCallApi from '../../hooks/useCallApi'
 
 function Dashboard() {
-  // const callApi = useCallApi()
+  const callApi = useCallApi()
   
   const [expanded, setExpanded] = useState(true);
   const [isModal, setIsModal] = useState(false);
@@ -14,7 +14,6 @@ function Dashboard() {
   return (
     <div className="flex">
       <aside>
-        {/* Truyền state expanded và setExpanded vào Sidebar */}
         <Sidebar expanded={expanded} setExpanded={setExpanded} />
       </aside>
       <div className="flex-1 flex flex-col transition-all m-2 bg-slate-300 rounded-xl items-center max-w-[90%]">

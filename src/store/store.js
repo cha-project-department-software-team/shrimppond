@@ -1,9 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-// Giả sử bạn có một rootReducer, có thể tạo file rootReducer.js để kết hợp các reducers (nếu có)
-import rootReducer from './rootReducer';  // Import rootReducer từ file khác
+import rootReducer from './rootReducer';  // Đảm bảo rootReducer tồn tại và đúng đường dẫn
 
 const store = configureStore({
-  reducer: rootReducer,  // Bạn sẽ cấu hình các reducers tại đây
+  reducer: rootReducer,  // Thêm reducers vào đây nếu cần
 });
 
-export default store;
+export default store;  // Đảm bảo bạn export store mặc định
