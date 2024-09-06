@@ -1,9 +1,10 @@
-import { combineReducers } from '@reduxjs/toolkit';
-// Giả sử bạn có một slice reducer, import nó tại đây
-import someReducer from './someReducer'; // Đây chỉ là ví dụ, bạn sẽ thay bằng reducer của bạn
+// src/store/rootReducer.js
+import { combineReducers } from 'redux';
+import sidebarReducer from './sidebarSlice';  // Import sidebarSlice
 
 const rootReducer = combineReducers({
-  some: someReducer, // Đây là reducer của bạn
+  sidebar: sidebarReducer,  // Thêm reducer sidebar vào rootReducer
+  // Các reducer khác
 });
 
 export default rootReducer;

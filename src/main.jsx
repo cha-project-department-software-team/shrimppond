@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom'; // Để quản lý routing
-import { Provider } from 'react-redux'; // Redux Provider để bao bọc store
-import App from './App'; // File gốc của bạn
-import './index.css'; // CSS chính của dự án
-import store from './store'; // Import store từ index.jsx
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import App from './App';
+import './index.css';  // Đảm bảo TailwindCSS vẫn được import
+import store from './store';  // Import đúng Redux store
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Provider store = {store}>
+    <Provider store={store}>  {/* Đảm bảo Provider bao bọc toàn bộ ứng dụng */}
+      <BrowserRouter>
         <App />
-      </Provider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>
 );

@@ -14,6 +14,7 @@ function Dashboard() {
   return (
     <div className="flex">
       <aside>
+        {/* Truyền state expanded và setExpanded vào Sidebar */}
         <Sidebar expanded={expanded} setExpanded={setExpanded} />
       </aside>
       <div className="flex-1 flex flex-col transition-all m-2 bg-slate-300 rounded-xl items-center max-w-[90%]">
