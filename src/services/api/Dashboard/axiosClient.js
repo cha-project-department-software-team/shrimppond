@@ -1,5 +1,5 @@
 import axios from "axios"
-import { api as apiConfig } from "../../config/api"
+import { api as apiConfig } from "../../../config/api"
 
 const axiosClient = axios.create(apiConfig.URLDomain)
 

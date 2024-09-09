@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
-import useCallApi from '../../hooks/useCallApi'; // Import hook useCallApi
+import useCallApi from '../../hooks/useCallApi';
+import { DashboardRequestApi } from '../../services/api';
 
 function Modal({ isModal, setIsModal }) { 
     const [blockName, setBlockName] = useState(''); // State để lưu giá trị của ô input
@@ -15,6 +16,10 @@ function Modal({ isModal, setIsModal }) {
         }
     };
 
+    const fetchData = useCallback(() => {
+        callApi(DashboardRequestApi.pondTypeRequest.createPondTypeRequest)
+    })
+
     const handleInputChange = (e) => {
         setBlockName(e.target.value); // Cập nhật state blockName với giá trị mới
     };
@@ -22,17 +27,18 @@ function Modal({ isModal, setIsModal }) {
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn chặn hành vi submit mặc định
 
-        // Cấu hình data cho request
-        const data = { name: blockName };
+        let data
+        let callApiFunction
+        let succesMessage
 
-        // const fetchData = useCallback(() => {
-        //     callApi(
-        //         [
-        //             'http://shrimppond.runasp.net/api/PondType'
-        //         ],
-        //     )
-        // }, [callApi])
-        
+        if (!blockName){
+            data =  { name: blockName }
+            callApiFunction =  DashboardRequestApi.pondTypeRequest.createPondTypeRequest(data)
+            succesMessage = "Đã tạo khối ao"
+        } else {
+            //putmethod
+        }
+        callApi(() => callApiFunction, fetchData, succesMessage)
     };
 
     return (
