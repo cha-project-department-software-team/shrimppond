@@ -68,12 +68,12 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) {
                 {/* Form nhập mã khối */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-6">
-                        <label htmlFor="pondTypeId" className="block text-left font-semibold mb-2">Nhập mã khối:</label>
+                        <label htmlFor="pondTypeId" className="block text-left font-semibold mb-2">Nhập lại tên khối:</label>
                         <input 
                             type="text" 
                             id="pondTypeId" 
                             name="pondTypeId" 
-                            placeholder="Nhập mã khối"
+                            placeholder="Nhập lại tên khối"
                             value={pondTypeId} // Liên kết giá trị với state pondTypeId
                             onChange={handleInputChange} // Gọi khi người dùng nhập
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" 

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { FaEllipsisV, FaBox, FaExchangeAlt, FaTrash } from 'react-icons/fa';
-import { BsInfoCircle } from 'react-icons/bs';
-import { FaShrimp } from "react-icons/fa6";
+import { FaEllipsisV} from 'react-icons/fa';
 import { actions } from '../../utils/constants'
 import { extraActions } from '../../utils/constants'
 
@@ -12,7 +10,7 @@ function Card({ pondId, status }) {  // Không cần props actions từ cha
 
 
   return (
-    <div className="flex-1 flex flex-col transition-all rounded-xl max-w-48 relative shadow-xl">
+    <div className="flex-1 flex flex-col transition-all rounded-xl max-w-48 relative">
       <div className="flex justify-between w-full bg-[#00A9EA] rounded-t-lg border border-black">
         <h1 className="text-black text-2xl font-bold ml-3 self-center">{pondId}</h1>
         <div className="text-black text-right text-xl mr-3 font-bold my-[-4px]">
