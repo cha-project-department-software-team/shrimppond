@@ -50,7 +50,7 @@ function Evista() {
     ],
     options: {
       chart: {
-        height: 350,
+        height: 250, // Giảm chiều cao biểu đồ
         type: chartType,
         zoom: {
           enabled: true
@@ -82,67 +82,67 @@ function Evista() {
   const timeLabels = chartData.options.xaxis.categories;
 
   return (
-    <div className="flex">
-      <aside>
+    <div className="flex h-screen overflow-hidden"> {/* Đảm bảo trang không cuộn */}
+      <aside className="w-1/5">
         <Sidebar />
       </aside>
-      <div className="flex-grow pt-5 px-10">
-        <h1 className="text-xl font-bold mb-6 flex items-center">
+      <div className="flex-grow p-4"> {/* Giảm padding */}
+        <h1 className="text-lg font-bold mb-4 flex items-center">
           <span className="mr-2">💧</span> Thông số môi trường
         </h1>
-        <div className="mb-6">
-          <div className="flex items-center space-x-4">
+        <div className="mb-4">
+          <div className="flex items-center space-x-2"> {/* Giảm khoảng cách giữa các dropdown */}
             <Dropdown
-              height={180} 
+              height={120} // Giảm chiều cao dropdown
               items={pondTypes} 
               buttonLabel="Loại ao" 
               onChange={handlePondTypeChange} 
             />
             <Dropdown 
-              height={180}
+              height={120}
               items={pondOptions} 
               buttonLabel="Chọn ao" 
               onChange={handlePondChange}
             />
             <Dropdown 
-              height={180}
+              height={120}
               items={parameter} 
               buttonLabel="Thông số" 
               onChange={handleParameterChange}
             />
           </div>
         </div>
-        <div className="flex items-center mb-6">
+        <div className="flex items-center mb-4">
           <button
             onClick={() => setChartType('line')}
-            className={`px-4 py-2 mr-4 text-white rounded ${chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300'}`}
+            className={`px-2 py-1 mr-2 text-white rounded ${chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300'}`}
           >
             Biểu đồ
           </button>
           <button
             onClick={() => setChartType('table')}
-            className={`px-4 py-2 text-white rounded ${chartType === 'table' ? 'bg-green-500' : 'bg-gray-300'}`}
+            className={`px-2 py-1 text-white rounded ${chartType === 'table' ? 'bg-green-500' : 'bg-gray-300'}`}
           >
             Dạng bảng
           </button>
         </div>
-        <div>
+        <div className="overflow-auto"> {/* Giới hạn chiều cao của vùng biểu đồ/bảng */}
           {chartType === 'table' ? (
             <table className="min-w-full bg-white border border-gray-300">
               <thead>
                 <tr>
-                  <th className="py-2 px-4 border border-gray-300 text-center">Thông số</th>
+                  <th className="py-1 px-2 border border-gray-300 text-center">Thông số</th>
                   {timeLabels.map((time) => (
-                    <th key={time} className="py-2 px-4 border border-gray-300 text-center">{time}</th>
+                    <th key={time} className="py-1 px-2 border border-gray-300 text-center">{time}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredSeries.map((serie) => (
                   <tr key={serie.name}>
-                    <td className="py-2 px-4 border border-gray-300 text-center">{serie.name}</td>
+                    <td className="py-1 px-2 border border-gray-300 text-center">{serie.name}</td>
                     {serie.data.map((value, index) => (
-                      <td key={index} className="py-2 px-4 border border-gray-300 text-center">{value}</td>
+                      <td key={index} className="py-1 px-2 border border-gray-300 text-center">{value}</td>
                     ))}
                   </tr>
                 ))}
@@ -153,7 +153,7 @@ function Evista() {
               options={chartData.options}
               series={filteredSeries}
               type={chartType}
-              height={340}
+              height={254} // Giảm chiều cao của biểu đồ
             />
           )}
         </div>
