@@ -5,7 +5,7 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import Card from '../Card/Card'; 
 import { useSelector } from 'react-redux';
 
-const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal }) => {  // Nhận thêm pondTypeName từ props
+const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal, onDelete }) => {  // Nhận thêm pondTypeName từ props
   const expanded = useSelector((state) => state.sidebar.expanded);
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -66,7 +66,9 @@ const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal 
         <span className="flex gap-x-3 pr-5">
           <FaTrashAlt 
             className = "cursor-pointer"
-            onClick={() => { setIsDeleteModal(true);}}  
+            onClick={() => { setIsDeleteModal(true);
+              onDelete(pondTypeName) // Gọi hàm onDelete khi nhấn nút xóa
+            }}  
           />
           <CiCirclePlus 
             className="text-4xl cursor-pointer" 

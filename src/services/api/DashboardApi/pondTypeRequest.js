@@ -6,9 +6,9 @@ const DashboardRequestApi = {
 
         createPondTypeRequest: async (data) => await axiosClient.post("/PondType", data),
 
-        deletePondTypeRequest: async (id) => await axiosClient.delete(`/PondType?PondTypeId=${id}`),
+        deletePondTypeRequest: async (name) => await axiosClient.delete(`/PondType?PondTypeName=${name}`),
     },
-    PondRequest: {
+    pondRequest: {
         getPondRequest: async () => await axiosClient.get("/Pond?pageSize=200&pageNumber=1"),
         getPondRequestById: async (id) => await axiosClient.get(`/Pond?search=${id}&pageSize=200&pageNumber=1`),
 

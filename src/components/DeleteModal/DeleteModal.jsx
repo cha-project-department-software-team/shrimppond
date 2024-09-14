@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi'; // Hook đã có sẵn
+import { DashboardRequestApi } from '../../services/api';
 
-function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) { 
-    const [pondTypeId, setPondTypeId] = useState(''); // Lưu mã khối (pondTypeId)
+function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSuccess }) { 
+    const [confirmPondTypeName, setConfirmPondTypeName] = useState(''); // Lưu tên khối nhập để xác nhận
     const [errorMessage, setErrorMessage] = useState(''); // Lưu thông báo lỗi
     const [isLoading, setIsLoading] = useState(false); // Xử lý trạng thái đang tải
     const callApi = useCallApi();
@@ -18,23 +19,24 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) {
     };
 
     const handleInputChange = (e) => {
-        setPondTypeId(e.target.value); // Cập nhật mã khối
+        setConfirmPondTypeName(e.target.value); // Cập nhật tên khối được nhập để xác nhận
         setErrorMessage(''); // Reset lại thông báo lỗi nếu người dùng nhập lại
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (pondTypeId.trim()) {
+        // Kiểm tra nếu tên khối nhập trùng với tên khối muốn xóa
+        if (confirmPondTypeName.trim() === pondTypeName) {
             setIsLoading(true); // Bật trạng thái loading
 
             callApi(
-                () => DashboardRequestApi.pondTypeRequest.deletePondTypeRequest(pondTypeId), // Gọi API để xóa PondType
+                () => DashboardRequestApi.pondTypeRequest.deletePondTypeRequest(pondTypeName), // Gọi API để xóa PondType
                 (res) => {
                     setIsLoading(false); // Tắt trạng thái loading
                     onDeleteSuccess(); // Gọi callback khi thành công
                     setIsDeleteModal(false); // Đóng Modal
-                    setPondTypeId(''); // Reset lại input
+                    setConfirmPondTypeName(''); // Reset lại input
                 },
                 'Khối đã được xóa thành công!', // Thông báo thành công
                 (err) => { // Xử lý lỗi
@@ -44,7 +46,7 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) {
                 }
             );
         } else {
-            setErrorMessage('Mã khối không được để trống!'); // Lỗi nếu người dùng không nhập mã
+            setErrorMessage('Tên khối không khớp!'); // Lỗi nếu tên khối không khớp
         }
     };
 
@@ -65,16 +67,17 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) {
                 {/* Tiêu đề */}
                 <header className="text-xl font-bold text-center uppercase mb-4">Xóa khối</header>
 
-                {/* Form nhập mã khối */}
+                {/* Form nhập tên khối để xác nhận */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-6">
-                        <label htmlFor="pondTypeId" className="block text-left font-semibold mb-2">Nhập lại tên khối:</label>
+                        <label htmlFor="confirmPondTypeName" className="block text-left font-semibold mb-2">Nhập lại tên khối để xóa:</label>
                         <input 
                             type="text" 
-                            id="pondTypeId" 
-                            name="pondTypeId" 
+                            id="confirmPondTypeName" 
+                            name="confirmPondTypeName" 
                             placeholder="Nhập lại tên khối"
-                            value={pondTypeId} // Liên kết giá trị với state pondTypeId
+                            autocomplete="off" 
+                            value={confirmPondTypeName} // Liên kết giá trị với state confirmPondTypeName
                             onChange={handleInputChange} // Gọi khi người dùng nhập
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" 
                         />
@@ -90,9 +93,9 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, onDeleteSuccess }) {
                         <button 
                             type="submit" 
                             className={cl("bg-green-300 hover:bg-green-400 text-black py-2 px-4 rounded-md shadow-md w-40", {
-                                'opacity-50 cursor-not-allowed': !pondTypeId || isLoading // Disable nếu không có dữ liệu hoặc đang tải
+                                'opacity-50 cursor-not-allowed': !confirmPondTypeName || isLoading // Disable nếu không có dữ liệu hoặc đang tải
                             })}
-                            disabled={!pondTypeId || isLoading} // Không cho submit khi không có dữ liệu
+                            disabled={!confirmPondTypeName || isLoading} // Không cho submit khi không có dữ liệu
                         >
                             {isLoading ? 'Đang xử lý...' : 'Xác nhận'}
                         </button>

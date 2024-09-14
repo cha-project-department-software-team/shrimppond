@@ -32,11 +32,11 @@ function Modal({ isModal, setIsModal, onPostSuccess }) {
         e.preventDefault();
      
         if (blockName.trim()) {
-            const data = [{
+            const data = {
                 pondTypeId: generateRandomId(), // Sinh ra chuỗi ký tự ngẫu nhiên
                 pondTypeName: blockName.trim(), // Tên khối từ input
-            }];
-     
+            };
+            
             setIsLoading(true); // Hiển thị trạng thái loading
      
             // Sử dụng hook useCallApi theo cách đúng
