@@ -92,26 +92,24 @@ function Evista() {
         </h1>
         <div className="mb-6">
           <div className="flex items-center space-x-4">
-            <Dropdown 
+            <Dropdown
+              height={180} 
               items={pondTypes} 
               buttonLabel="Loại ao" 
               onChange={handlePondTypeChange} 
             />
             <Dropdown 
+              height={180}
               items={pondOptions} 
               buttonLabel="Chọn ao" 
               onChange={handlePondChange}
             />
             <Dropdown 
+              height={180}
               items={parameter} 
               buttonLabel="Thông số" 
               onChange={handleParameterChange}
             />
-            <button className="ml-auto p-2 bg-gray-200 rounded">
-              <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m7-7l-7 7 7 7"></path>
-              </svg>
-            </button>
           </div>
         </div>
         <div className="flex items-center mb-6">
@@ -155,7 +153,7 @@ function Evista() {
               options={chartData.options}
               series={filteredSeries}
               type={chartType}
-              height={350}
+              height={340}
             />
           )}
         </div>
