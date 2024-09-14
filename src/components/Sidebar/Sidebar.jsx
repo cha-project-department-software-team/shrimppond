@@ -1,14 +1,14 @@
-import React, {useState, useLayoutEffect} from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
 import { BsGrid, BsDroplet, BsBox, BsShuffle, BsInfoCircle, BsSearch, BsFileText } from 'react-icons/bs';
-import { useSidebar } from '../../store/SidebarContext';
-
+import { useSelector, useDispatch } from 'react-redux'; // Thêm useSelector và useDispatch từ Redux
+import { toggleSidebar } from '../../store/sidebarSlice'; 
 
 function Sidebar() {
   const menuItems = [
-    { name: "Dashboard", icon: <BsGrid />, lnk:  "/" },
+    { name: "Dashboard", icon: <BsGrid />, lnk: "/" },
     { name: "Thông số môi trường", icon: <BsDroplet />, lnk: "/evista" },
     { name: "Thu hoạch", icon: <BsBox />, lnk: "/harvest" },
     { name: "Chuyển ao", icon: <BsShuffle />, lnk: "/move" },
@@ -16,9 +16,14 @@ function Sidebar() {
     { name: "Truy xuất nguồn gốc", icon: <BsSearch />, lnk: "/access" },
     { name: "Thông tin trang trại", icon: <BsFileText />, lnk: "/status" },
   ];
+
   const navigate = useNavigate();
-  const { expanded, setExpanded } = useSidebar();
-  const [active, setActive] = useState("Dashboard");
+  const location = useLocation();
+
+  const expanded = useSelector((state) => state.sidebar.expanded); // Lấy trạng thái expanded từ Redux store
+  const dispatch = useDispatch(); // Sử dụng dispatch để kích hoạt hành động
+
+  const [active, setActive] = React.useState("Dashboard");
 
   useLayoutEffect(() => {
     const currentPath = location.pathname;
@@ -26,13 +31,13 @@ function Sidebar() {
     if (activeItem) {
       setActive(activeItem.name);
     }
-  }, [location.pathname])
-
+  }, [location.pathname, menuItems]);
 
   return (
     <aside className={`h-screen ${expanded ? "w-64" : "w-[86px]"} transition-width duration-300`}>
       <nav className="h-full flex flex-col bg-[#1396c2] border-r shadow-sm">
         <div className="p-3 pl-0 flex justify-between items-center">
+          {/* Logo */}
           <img
             src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoatoi.png"
             className={`transition-all duration-300 ${expanded ? "w-16" : "w-10"}`}
@@ -44,10 +49,13 @@ function Sidebar() {
               <span className="font-bold text-black">Pond</span>
             </div>
           )}
-          <button onClick={() => setExpanded(prev => !prev)} className="rounded-lg text-xl">
+          {/* Button để mở rộng/thu gọn Sidebar */}
+          <button onClick={() => dispatch(toggleSidebar())} className="rounded-lg text-xl">
             <TfiAlignJustify />
           </button>
         </div>
+
+        {/* Danh sách menu */}
         <ul className="flex-1 px-3 space-y-3">
           {menuItems.map((item) => (
             <li
@@ -77,6 +85,7 @@ function Sidebar() {
           ))}
         </ul>
 
+        {/* Phần Logout */}
         <div className="border-t p-3 flex justify-between items-center">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gray-400 rounded-full mr-2"></div>
