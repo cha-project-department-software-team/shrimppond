@@ -1,1 +1,1 @@
-export {default as DashboardRequestApi} from './dashboard-api';
+export {default as DashboardRequestApi} from './DashboardApi/pondTypeRequest';
