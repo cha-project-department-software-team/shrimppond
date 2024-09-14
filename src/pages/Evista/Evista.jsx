@@ -41,38 +41,39 @@ function Evista() {
     series: [
       {
         name: 'Nhiệt độ',
-        data: [35, 34, 33, 32, 31, 30, 29, 28, 27, 26]
+        data: [35, 34, 33, 32, 31, 30, 29, 28, 27, 26],
       },
       {
         name: 'PH',
-        data: [7.5, 7.4, 7.3, 7.2, 7.2, 7.1, 7.0, 6.9, 6.8, 6.7]
-      }
+        data: [7.5, 7.4, 7.3, 7.2, 7.2, 7.1, 7.0, 6.9, 6.8, 6.7],
+      },
     ],
     options: {
       chart: {
-        height: 250, // Giảm chiều cao biểu đồ
+        height: 254, // Giảm chiều cao biểu đồ
         type: chartType,
         zoom: {
-          enabled: true
-        }
+          enabled: true,
+        },
       },
       xaxis: {
-        categories: ['16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h', '24h', '01h']
+        categories: ['16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h', '24h', '01h'],
       },
       yaxis: {
         title: {
-          text: selectedParameter === 'PH' ? 'PH' : 'Nhiệt độ (°C)'
-        }
+          text: selectedParameter === 'PH' ? 'PH' : 'Nhiệt độ (°C)',
+        },
       },
-      colors: selectedParameter === 'Nhiệt độ'
-                ? ['#FF4560']
-                : selectedParameter === 'PH'
-                ? ['#00E396']
-                : ['#FF4560', '#00E396'],
+      colors:
+        selectedParameter === 'Nhiệt độ'
+          ? ['#FF4560']
+          : selectedParameter === 'PH'
+          ? ['#00E396']
+          : ['#FF4560', '#00E396'],
       stroke: {
-        curve: 'smooth'
-      }
-    }
+        curve: 'smooth',
+      },
+    },
   };
 
   const filteredSeries = selectedParameter
@@ -82,67 +83,77 @@ function Evista() {
   const timeLabels = chartData.options.xaxis.categories;
 
   return (
-    <div className="flex h-screen overflow-hidden"> {/* Đảm bảo trang không cuộn */}
-      <aside className="w-1/5">
+    <div className="flex w-full bg-gray-50 h-screen overflow-hidden"> {/* Sử dụng nền sáng */}
+      <aside>
         <Sidebar />
       </aside>
-      <div className="flex-grow p-4"> {/* Giảm padding */}
-        <h1 className="text-lg font-bold mb-4 flex items-center">
-          <span className="mr-2">💧</span> Thông số môi trường
+      <div className="flex-grow p-6 space-y-6"> {/* Giảm padding và thêm khoảng cách giữa các phần tử */}
+        <h1 className="text-2xl font-bold text-gray-700 flex items-center space-x-2"> {/* Tăng kích cỡ tiêu đề */}
+          <span>💧</span> 
+          <span>Thông số môi trường</span>
         </h1>
-        <div className="mb-4">
-          <div className="flex items-center space-x-2"> {/* Giảm khoảng cách giữa các dropdown */}
+        
+        <div className=""> {/* Nền trắng, bo tròn và đổ bóng */}
+          <div className="flex items-center space-x-4"> {/* Khoảng cách giữa các dropdown */}
             <Dropdown
-              height={120} // Giảm chiều cao dropdown
-              items={pondTypes} 
-              buttonLabel="Loại ao" 
-              onChange={handlePondTypeChange} 
+              height={184}
+              items={pondTypes}
+              buttonLabel="Loại ao"
+              onChange={handlePondTypeChange}
             />
-            <Dropdown 
-              height={120}
-              items={pondOptions} 
-              buttonLabel="Chọn ao" 
+            <Dropdown
+              height={184}
+              items={pondOptions}
+              buttonLabel="Chọn ao"
               onChange={handlePondChange}
             />
-            <Dropdown 
-              height={120}
-              items={parameter} 
-              buttonLabel="Thông số" 
+            <Dropdown
+              height={184}
+              items={parameter}
+              buttonLabel="Thông số"
               onChange={handleParameterChange}
             />
           </div>
         </div>
-        <div className="flex items-center mb-4">
+
+        <div className="flex space-x-4"> {/* Thêm khoảng cách giữa các nút */}
           <button
             onClick={() => setChartType('line')}
-            className={`px-2 py-1 mr-2 text-white rounded ${chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300'}`}
+            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${
+              chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300 hover:bg-gray-400'
+            }`}
           >
             Biểu đồ
           </button>
           <button
             onClick={() => setChartType('table')}
-            className={`px-2 py-1 text-white rounded ${chartType === 'table' ? 'bg-green-500' : 'bg-gray-300'}`}
+            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${
+              chartType === 'table' ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-400'
+            }`}
           >
             Dạng bảng
           </button>
         </div>
-        <div className="overflow-auto"> {/* Giới hạn chiều cao của vùng biểu đồ/bảng */}
+
+        <div className="bg-white p-4 rounded-lg shadow-md overflow-auto"> {/* Bo tròn và đổ bóng */}
           {chartType === 'table' ? (
-            <table className="min-w-full bg-white border border-gray-300">
+            <table className="min-w-full bg-white border border-gray-200 rounded-md">
               <thead>
-                <tr>
-                  <th className="py-1 px-2 border border-gray-300 text-center">Thông số</th>
+                <tr className="bg-gray-100">
+                  <th className="py-2 px-4 border-b text-left font-medium text-gray-700">Thông số</th>
                   {timeLabels.map((time) => (
-                    <th key={time} className="py-1 px-2 border border-gray-300 text-center">{time}</th>
+                    <th key={time} className="py-2 px-4 border-b text-left font-medium text-gray-700">
+                      {time}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredSeries.map((serie) => (
                   <tr key={serie.name}>
-                    <td className="py-1 px-2 border border-gray-300 text-center">{serie.name}</td>
+                    <td className="py-2 px-4 border-b text-gray-600">{serie.name}</td>
                     {serie.data.map((value, index) => (
-                      <td key={index} className="py-1 px-2 border border-gray-300 text-center">{value}</td>
+                      <td key={index} className="py-2 px-4 border-b text-gray-600">{value}</td>
                     ))}
                   </tr>
                 ))}
