@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi'; // Hook đã có sẵn
@@ -76,7 +76,6 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSu
                             id="confirmPondTypeName" 
                             name="confirmPondTypeName" 
                             placeholder="Nhập lại tên khối"
-                            autocomplete="off" 
                             value={confirmPondTypeName} // Liên kết giá trị với state confirmPondTypeName
                             onChange={handleInputChange} // Gọi khi người dùng nhập
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" 
@@ -106,4 +105,4 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSu
     );
 }
 
-export default DeleteModal;
+export default memo(DeleteModal);

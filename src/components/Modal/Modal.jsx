@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi';
@@ -35,6 +35,7 @@ function Modal({ isModal, setIsModal, onPostSuccess }) {
             const data = {
                 pondTypeId: generateRandomId(), // Sinh ra chuỗi ký tự ngẫu nhiên
                 pondTypeName: blockName.trim(), // Tên khối từ input
+                farmName: "fablab"
             };
             
             setIsLoading(true); // Hiển thị trạng thái loading
@@ -114,4 +115,4 @@ function Modal({ isModal, setIsModal, onPostSuccess }) {
     );
 }
 
-export default Modal;
+export default memo(Modal);

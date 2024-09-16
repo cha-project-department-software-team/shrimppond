@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { CiCirclePlus } from "react-icons/ci";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import Card from '../Card/Card'; 
 import { useSelector } from 'react-redux';
 
-const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal, onDelete }) => {  // Nhận thêm pondTypeName từ props
+const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, onSelected }) => {  // Nhận thêm pondTypeName từ props
   const expanded = useSelector((state) => state.sidebar.expanded);
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -62,16 +62,19 @@ const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal,
     <div className="relative flex flex-col w-[90%] h-[30%] bg-white rounded-xl pb-1 border mt-1 shadow-xl">
       <div className="flex text-3xl font-bold mb-1 justify-between p-1">
         {/* Thay thế tiêu đề "Ao ươm" bằng pondTypeName */}
-        <h1>{pondTypeName}</h1>  
+        <h1 className ="px-4">{pondTypeName}</h1>  
         <span className="flex gap-x-3 pr-5">
           <FaTrashAlt 
             className = "cursor-pointer"
             onClick={() => { setIsDeleteModal(true);
-              onDelete(pondTypeName) // Gọi hàm onDelete khi nhấn nút xóa
+              onSelected(pondTypeName) // Gọi hàm onSelected khi nhấn nút xóa
             }}  
           />
           <CiCirclePlus 
-            className="text-4xl cursor-pointer" 
+            className="text-4xl cursor-pointer"
+            onClick={() => { setIsCreateModal(true);
+              onSelected(pondTypeName) // Gọi hàm onSelected khi nhấn nút xóa
+            }}   
           />
         </span>
       </div>
@@ -95,8 +98,11 @@ const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal,
           onMouseLeave={() => setDragging(false)}
         >
           <div className="flex gap-x-3 h-full">
-            {arrayTest.map((res) => (
-              <Card pondId={res.pondId} status={res.status} key={res.pondId} />
+            {ponds.map((res) => (
+              <Card 
+              pondId={res.pondId} 
+              status={res.status} 
+              key={res.pondId} />
             ))}
           </div>
         </div>
@@ -114,4 +120,4 @@ const PondSummary = ({ arrayTest, pondTypeName, isDeleteModal, setIsDeleteModal,
   );
 };
 
-export default PondSummary;
+export default memo(PondSummary);

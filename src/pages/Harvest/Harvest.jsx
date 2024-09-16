@@ -2,13 +2,16 @@ import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import useCallApi from '../../hooks/useCallApi';
 import React, { useState, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { DashboardRequestApi } from '../../services/api';
+import CreateModal from '../../components/CreateModal'
+
 
 function Harvest (){
 
     const navigate = useNavigate()
     const callApi = useCallApi();
+
+    const [isCreateModal, setIsCreateModal] = useState(false)
 
     const fetchData = useCallback(() => {
         callApi(
@@ -21,15 +24,26 @@ function Harvest (){
       }, [callApi]);
     useEffect(() => {
         fetchData();
-      }, [fetchData]);
+    }, [fetchData]);
 
+    console.log(isCreateModal)
+
+    
     return (
         <div className ="flex">
             <aside>
                 <Sidebar />
             </aside>
-            
+            <button onClick = {prev => setIsCreateModal(!prev)}>
+              isCreateModal
+            </button>
 
+
+          <CreateModal 
+            isCreateModal = {isCreateModal}
+            setIsCreateModal = {setIsCreateModal}
+            onPostSuccess = {fetchData()}
+          />
         </div>   
     )
 }
