@@ -9,13 +9,11 @@ const generateRandomId = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
-function Modal({ isModal, setIsModal, onPostSuccess }) { 
+function Modal({  setIsModal, onPostSuccess }) { 
     const [blockName, setBlockName] = useState(''); // State để lưu giá trị của ô input
     const [errorMessage, setErrorMessage] = useState(''); // State lưu lỗi
     const [isLoading, setIsLoading] = useState(false); // State xử lý khi submit
     const callApi = useCallApi(); // Khởi tạo hook useCallApi
-
-    if (!isModal) return null; // Không render Modal nếu isModal là false
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {
@@ -63,7 +61,7 @@ function Modal({ isModal, setIsModal, onPostSuccess }) {
 
     return (
         <div 
-            className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-20")} 
+            className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50")} 
             onClick={handleCloseModal} // Thêm sự kiện onClick vào div bao ngoài
         >
             <div className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">

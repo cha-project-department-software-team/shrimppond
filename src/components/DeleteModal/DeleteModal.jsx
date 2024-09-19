@@ -31,20 +31,19 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSu
             setIsLoading(true); // Bật trạng thái loading
 
             callApi(
-                () => DashboardRequestApi.pondTypeRequest.deletePondTypeRequest(pondTypeName), // Gọi API để xóa PondType
+                () => DashboardRequestApi.pondRequest.deletePondRequest(pondId), // Gọi API xóa pond theo pondId
                 (res) => {
-                    setIsLoading(false); // Tắt trạng thái loading
-                    onDeleteSuccess(); // Gọi callback khi thành công
-                    setIsDeleteModal(false); // Đóng Modal
-                    setConfirmPondTypeName(''); // Reset lại input
+                  setIsLoading(false); 
+                  if (onDeleteCardSuccess) onDeleteCardSuccess(); // Kiểm tra nếu onDeleteCardSuccess tồn tại và gọi nó
+                  setIsDeleteCard(false); 
+                  setConfirmPondId(''); 
                 },
-                'Khối đã được xóa thành công!', // Thông báo thành công
-                (err) => { // Xử lý lỗi
-                    setIsLoading(false); // Tắt trạng thái loading
-                    setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); // Hiển thị lỗi
-                    console.error('Error:', err);
+                'Pond đã được xóa thành công!', 
+                (err) => {
+                  setIsLoading(false); 
+                  setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); 
                 }
-            );
+              );              
         } else {
             setErrorMessage('Tên khối không khớp!'); // Lỗi nếu tên khối không khớp
         }
@@ -91,7 +90,7 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSu
                     <div className="flex justify-center">
                         <button 
                             type="submit" 
-                            className={cl("bg-green-300 hover:bg-green-400 text-black py-2 px-4 rounded-md shadow-md w-40", {
+                            className={cl("bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md shadow-md w-40", {
                                 'opacity-50 cursor-not-allowed': !confirmPondTypeName || isLoading // Disable nếu không có dữ liệu hoặc đang tải
                             })}
                             disabled={!confirmPondTypeName || isLoading} // Không cho submit khi không có dữ liệu

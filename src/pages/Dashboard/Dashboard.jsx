@@ -71,12 +71,13 @@ function Dashboard() {
 
           return (
             <PondSummary
-              key={pondType.pondTypeId} // Key là pondTypeId
-              pondTypeName={pondType.pondTypeName} // Truyền pondTypeName vào PondSummary
-              ponds={filteredPonds} // Truyền danh sách ponds đã lọc vào PondSummary
+              key={pondType.pondTypeId} 
+              pondTypeName={pondType.pondTypeName} 
+              ponds={filteredPonds} 
               setIsDeleteModal={setIsDeleteModal}
-              setIsCreateModal = {setIsCreateModal}
-              onSelected={handleSelected} // Truyền hàm xử lý xóa
+              setIsCreateModal={setIsCreateModal}
+              onSelected={handleSelected} 
+              onDeleteCardSuccess={fetchData}  // Sửa lại: truyền hàm thay vì gọi ngay lập tức
             />
           );
         })}
@@ -87,11 +88,10 @@ function Dashboard() {
         >
           <h1 className = "text-xl font-bold">Tạo khối</h1>
         </button>
-        <Modal
-          isModal={isModal}
+        {isModal && <Modal
           setIsModal={setIsModal}
           onPostSuccess={fetchData} // Truyền callback để fetch dữ liệu sau POST
-        />
+        />}
         <DeleteModal 
           isDeleteModal={isDeleteModal} 
           setIsDeleteModal={setIsDeleteModal} 

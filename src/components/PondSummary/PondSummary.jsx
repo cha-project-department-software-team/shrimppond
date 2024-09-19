@@ -5,7 +5,7 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import Card from '../Card/Card'; 
 import { useSelector } from 'react-redux';
 
-const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, onSelected }) => {  // Nhận thêm pondTypeName từ props
+const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, onSelected, onDeleteCardSuccess }) => {  // Nhận thêm pondTypeName từ props
   const expanded = useSelector((state) => state.sidebar.expanded);
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -81,7 +81,7 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
 
       <div className={`overflow-hidden no-scrollbar px-5 h-full relative ${expanded ? "max-w-5xl" : "max-w-full"}`}>
         {showLeftArrow && (
-          <div className="absolute top-0 w-24 h-[70%] flex items-center left-0 z-10"
+          <div className="absolute top-0 w-24 h-full flex items-center left-0 z-10"
             style={{ background: 'linear-gradient(90deg, #fff 70%, transparent)' }}
             onClick={handleLeftArrowClick}
           >
@@ -98,17 +98,20 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
           onMouseLeave={() => setDragging(false)}
         >
           <div className="flex gap-x-3 h-full">
-            {ponds.map((res) => (
-              <Card 
+          {ponds.map((res) => (
+            <Card 
               pondId={res.pondId} 
               status={res.status} 
-              key={res.pondId} />
-            ))}
+              key={res.pondId}
+              onDeleteCardSuccess={onDeleteCardSuccess} // Truyền hàm xuống component Card
+            />
+          ))}
+
           </div>
         </div>
 
         {showRightArrow && (
-          <div className="absolute top-0 h-[70%] w-24 flex items-center right-0 justify-end"
+          <div className="absolute top-0 h-full w-24 flex items-center right-0 justify-end"
             style={{ background: 'linear-gradient(-90deg, #fff 70%, transparent)' }}
             onClick={handleRightArrowClick}
           >
