@@ -8,7 +8,7 @@ import store from './store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Provider store={store}>  {/* Đảm bảo Provider bao bọc toàn bộ ứng dụng */}
+    <Provider store={store}> 
       <BrowserRouter>
         <App />
       </BrowserRouter>

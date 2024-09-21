@@ -4,8 +4,10 @@ import { actions } from '../../utils/constants'
 import { extraActions } from '../../utils/constants'
 import DeleteCard from '../DeleteCard'
 import cl from "classnames"
+import ActiveCard from '../../components/ActiveCard'
 
-function Card({ pondId, status, onDeleteCardSuccess }) {  // Không cần props actions từ cha
+function Card({ pondId, status, onDeleteCardSuccess, onPutSucces }) {  // Không cần props actions từ 
+  const [isActiveModal, setIsActiveModal] = useState(false)
   const [extra, setExtra] = useState(false);
   const [isDeleteCard, setIsDeleteCard] = useState(false)
 
@@ -26,34 +28,37 @@ function Card({ pondId, status, onDeleteCardSuccess }) {  // Không cần props 
         </div>
       </div>
 
-      {status ? (<div className="flex flex-col w-full py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black">
-        <div className="flex gap-x-1">
-          {actions.map((action) => (
-            <div key={action.id} 
-              className={`w-9 h-8 ${action.bgColor} rounded-xl flex items-center justify-center`}
-              // onClick = {() => {
-              //   if (actions.name)
-              // }}
-            >
-              {action.icon}
-            </div>
-          ))}
-          <div className="flex items-center justify-center">
-            <FaEllipsisV
-              onClick={() => setExtra((prev) => !prev)}
-              className="text-black text-xl cursor-pointer"
-            />
-          </div>
+      {status ? (
+  <div className="flex flex-col w-full py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black">
+    <div className="flex gap-x-1">
+      {actions.map((action) => (
+        <div key={action.id} 
+          className={`w-9 h-8 ${action.bgColor} rounded-xl flex items-center justify-center`}
+        >
+          {action.icon}
         </div>
-      </div>) : (
-        <div className="flex flex-col py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black h-11 w-40 items-center">
-          <button className = "bg-green-400 hover:bg-green-500 rounded-xl mt-1 w-28 font-semibold h-6">
-            Kích hoạt
-          </button>
-        </div>
-      )}
+      ))}
+      <div className="flex items-center justify-center">
+        <FaEllipsisV
+          onClick={() => setExtra((prev) => !prev)}
+          className="text-black text-xl cursor-pointer"
+        />
+      </div>
+    </div>
+  </div>
+) : (
+  <div className="flex flex-col py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black h-11 w-40 items-center">
+    <button 
+      className="bg-green-400 hover:bg-green-500 rounded-xl mt-1 w-28 font-semibold h-6"
+      onClick={() => setIsActiveModal(true)} // Sửa đổi callback
+    >
+      Kích hoạt
+    </button>
+  </div>
+)}
 
-      {extra && status &&(
+
+      {extra &&(
         <div className="absolute bottom-0 left-0 flex flex-nowrap gap-x-1 bg-white p-1 rounded-lg z-0 border border-black max-w-48">
           {extraActions.map((extraAction) => (
             <div key={extraAction.id} 
@@ -72,9 +77,16 @@ function Card({ pondId, status, onDeleteCardSuccess }) {  // Không cần props 
         <DeleteCard 
           pondId={pondId} 
           setIsDeleteCard={setIsDeleteCard}
-          onDeleteCardSuccess={onDeleteCardSuccess} // Truyền đúng callback
+          onDeleteCardSuccess={onDeleteCardSuccess}
         />
       )}
+
+      {isActiveModal && 
+        <ActiveCard
+          setIsActiveModal = {setIsActiveModal}
+          onDeleteCardSuccess = {onPutSucces}
+          pondId = {pondId}
+        />}
 
 
 

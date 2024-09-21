@@ -5,7 +5,7 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import Card from '../Card/Card'; 
 import { useSelector } from 'react-redux';
 
-const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, onSelected, onDeleteCardSuccess }) => {  // Nhận thêm pondTypeName từ props
+const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, onSelected, onDeleteCardSuccess, onPutSucces }) => {  // Nhận thêm pondTypeName từ props
   const expanded = useSelector((state) => state.sidebar.expanded);
   const [dragging, setDragging] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -99,7 +99,8 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
         >
           <div className="flex gap-x-3 h-full">
           {ponds.map((res) => (
-            <Card 
+            <Card
+              onPutSucces = {onPutSucces} 
               pondId={res.pondId} 
               status={res.status} 
               key={res.pondId}

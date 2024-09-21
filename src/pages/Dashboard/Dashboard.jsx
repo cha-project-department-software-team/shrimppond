@@ -7,6 +7,10 @@ import useCallApi from '../../hooks/useCallApi';
 import { useSelector } from 'react-redux';
 import { DashboardRequestApi } from '../../services/api';
 import CreateModal from '../../components/CreateModal'
+import ImageModal from '../../components/ImageModal'
+import { FaMapMarkerAlt  } from "react-icons/fa";
+import oxygen from '../../assets/image/oxygen.png'
+
 
 function Dashboard() {
   const callApi = useCallApi();
@@ -15,6 +19,8 @@ function Dashboard() {
   const [isModal, setIsModal] = useState(false);
   const [isCreateModal, setIsCreateModal] = useState(false)
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [showImage ,setShowImage] = useState(false)
+  const [activePonds, setActivePonds] = useState(0)
   const [pondTypes, setPondTypes] = useState([]); // State để lưu danh sách pondTypes
   const [ponds, setPonds] = useState([]); // State để lưu danh sách pondTypes
   const [selectedPondTypeName, setSelectedPondTypeName] = useState(''); // State để lưu tên khối được chọn để xóa
@@ -24,11 +30,14 @@ function Dashboard() {
     callApi(
       [
         DashboardRequestApi.pondTypeRequest.getPondTypeRequest(),
-        DashboardRequestApi.pondRequest.getPondRequest()
+        DashboardRequestApi.pondRequest.getPondRequest(),
+        DashboardRequestApi.pondRequest.getPondRequestByStatus(1),
+
       ], 
       (res) => {
         setPondTypes(res[0]); // Lưu dữ liệu vào state pondTypes
         setPonds(res[1]); // Lưu dữ liệu vào state ponds
+        setActivePonds(res[2].length)
       },
       "Lấy danh sách khối ao thất bại!"
     );
@@ -43,6 +52,8 @@ function Dashboard() {
     setSelectedPondTypeName(pondTypeName); // Đặt tên khối được chọn
   };
 
+  // const pondActive = ponds.map
+
   return (
     <div className="flex">
       <aside>
@@ -56,7 +67,7 @@ function Dashboard() {
           </div>
           <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
             <h1 className="uppercase text-xl font-semibold md:text-xl">Số ao nuôi</h1>
-            <span className="font-bold text-5xl text-green-600/[.86]">04</span> {/* Tùy chỉnh số ao nuôi */}
+            <span className="font-bold text-5xl text-green-600/[.86]">{activePonds}</span> {/* Tùy chỉnh số ao nuôi */}
           </div>
           <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
             <h1 className="uppercase text-xl font-semibold md:text-xl">Môi trường</h1>
@@ -70,17 +81,26 @@ function Dashboard() {
           const filteredPonds = ponds.filter(pond => pond.pondTypeName === pondType.pondTypeName);
 
           return (
-            <PondSummary
+            
+              <PondSummary
+              onPutSucces = {fetchData}
               key={pondType.pondTypeId} 
               pondTypeName={pondType.pondTypeName} 
               ponds={filteredPonds} 
               setIsDeleteModal={setIsDeleteModal}
               setIsCreateModal={setIsCreateModal}
               onSelected={handleSelected} 
-              onDeleteCardSuccess={fetchData}  // Sửa lại: truyền hàm thay vì gọi ngay lập tức
+              onDeleteCardSuccess={fetchData}
             />
           );
         })}
+
+        <FaMapMarkerAlt 
+          onClick = {() => setShowImage(true)}
+          className = "fixed top-5 right-5 text-4xl text-red-500"
+        >
+          abcxyz
+        </FaMapMarkerAlt>
 
         <button
           onClick={() => { setIsModal(true); }}
@@ -105,7 +125,10 @@ function Dashboard() {
           onPostSuccess = {fetchData}
           pondTypeName = {selectedPondTypeName}
         />
-
+        
+        {showImage && <ImageModal 
+          setShowImage = {setShowImage}
+        />}
 
       </div>
     </div>

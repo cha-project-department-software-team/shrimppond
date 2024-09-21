@@ -8,10 +8,13 @@ function Move (){
     return (
         <>
             <div className ="flex">
-                <Sidebar />
-                <h1>
-                    Move Page
-                </h1>
+                <aside>
+                    <Sidebar />
+                </aside>
+                <div className = "">
+                    
+                </div>
+                
             </div>
         </>
     )

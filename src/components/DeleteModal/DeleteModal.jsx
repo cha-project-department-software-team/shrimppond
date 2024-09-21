@@ -31,18 +31,18 @@ function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSu
             setIsLoading(true); // Bật trạng thái loading
 
             callApi(
-                () => DashboardRequestApi.pondRequest.deletePondRequest(pondId), // Gọi API xóa pond theo pondId
+                () => DashboardRequestApi.pondTypeRequest.deletePondTypeRequest(pondTypeName), // Gọi API để xóa PondType
                 (res) => {
-                  setIsLoading(false); 
-                  if (onDeleteCardSuccess) onDeleteCardSuccess(); // Kiểm tra nếu onDeleteCardSuccess tồn tại và gọi nó
-                  setIsDeleteCard(false); 
-                  setConfirmPondId(''); 
+                    setIsLoading(false); // Tắt trạng thái loading
+                    onDeleteSuccess(); // Gọi callback khi thành công
+                    setIsDeleteModal(false); // Đóng Modal
+                    setConfirmPondTypeName(''); // Reset lại input
                 },
-                'Pond đã được xóa thành công!', 
-                (err) => {
-                  setIsLoading(false); 
-                  setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); 
-                }
+                'Khối đã được xóa thành công!', // Thông báo thành công
+                (err) => { // Xử lý lỗi
+                    setIsLoading(false); // Tắt trạng thái loading
+                    setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); // Hiển thị lỗi
+                    console.error('Error:', err);}
               );              
         } else {
             setErrorMessage('Tên khối không khớp!'); // Lỗi nếu tên khối không khớp
