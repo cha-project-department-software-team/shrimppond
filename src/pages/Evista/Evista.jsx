@@ -7,6 +7,7 @@ import choosePondB from '../../utils/constants/choosePondB';
 import parameter from '../../utils/constants/parameter';
 import pondTypes from '../../utils/constants/pondTypes';
 import Chart from 'react-apexcharts';
+import { EvistaRequestApi } from '../../services/api';
 
 function Evista() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function Evista() {
   const handlePondTypeChange = (selectedItem) => {
     setSelectedPondType(selectedItem);
 
-    if (selectedItem === 'Ao ươm') {
+    if (selectedItem === 'Ao ương') {
       setPondOptions(choosePondA);
     } else if (selectedItem === 'Ao thương phẩm') {
       setPondOptions(choosePondB);
@@ -50,7 +51,7 @@ function Evista() {
     ],
     options: {
       chart: {
-        height: 254, // Giảm chiều cao biểu đồ
+        height: 254,
         type: chartType,
         zoom: {
           enabled: true,
@@ -61,54 +62,49 @@ function Evista() {
       },
       yaxis: {
         title: {
-          text: selectedParameter === 'PH' ? 'PH' : 'Nhiệt độ (°C)',
+          text: selectedParameter === 'PH' ? 'PH' : (selectedParameter === 'Nhiệt độ (°C)' ? 'Nhiệt độ (°C)' : 'Các thông số'),
         },
       },
-      colors:
-        selectedParameter === 'Nhiệt độ'
-          ? ['#FF4560']
-          : selectedParameter === 'PH'
-          ? ['#00E396']
-          : ['#FF4560', '#00E396'],
+            
+      colors: selectedParameter === 'Nhiệt độ' ? ['#FF4560'] : selectedParameter === 'PH' ? ['#00E396'] : ['#FF4560', '#00E396'],
       stroke: {
         curve: 'smooth',
       },
     },
   };
 
+  const timeLabels = chartData.options.xaxis.categories;
   const filteredSeries = selectedParameter
     ? chartData.series.filter((serie) => serie.name === selectedParameter)
     : chartData.series;
 
-  const timeLabels = chartData.options.xaxis.categories;
-
   return (
-    <div className="flex w-full bg-gray-50 h-screen overflow-hidden"> {/* Sử dụng nền sáng */}
+    <div className="flex w-full bg-gray-50 h-screen overflow-hidden">
       <aside>
         <Sidebar />
       </aside>
-      <div className="flex-grow p-6 space-y-6"> {/* Giảm padding và thêm khoảng cách giữa các phần tử */}
-        <h1 className="text-2xl font-bold text-gray-700 flex items-center space-x-2"> {/* Tăng kích cỡ tiêu đề */}
-          <span>💧</span> 
+      <div className="flex-grow p-6 space-y-6">
+        <h1 className="text-2xl font-bold text-gray-700 flex items-center space-x-2">
+          <span>💧</span>
           <span>Thông số môi trường</span>
         </h1>
         
-        <div className=""> {/* Nền trắng, bo tròn và đổ bóng */}
-          <div className="flex items-center space-x-4"> {/* Khoảng cách giữa các dropdown */}
+        <div className="">
+          <div className="flex items-center space-x-4">
             <Dropdown
-              height={184}
+              height={180}
               items={pondTypes}
               buttonLabel="Loại ao"
               onChange={handlePondTypeChange}
             />
             <Dropdown
-              height={184}
+              height={180}
               items={pondOptions}
               buttonLabel="Chọn ao"
               onChange={handlePondChange}
             />
             <Dropdown
-              height={184}
+              height={180}
               items={parameter}
               buttonLabel="Thông số"
               onChange={handleParameterChange}
@@ -116,44 +112,40 @@ function Evista() {
           </div>
         </div>
 
-        <div className="flex space-x-4"> {/* Thêm khoảng cách giữa các nút */}
+        <div className="flex space-x-4">
           <button
             onClick={() => setChartType('line')}
-            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${
-              chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300 hover:bg-gray-400'
-            }`}
+            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${chartType === 'line' ? 'bg-pink-500' : 'bg-gray-300 hover:bg-gray-400'}`}
           >
             Biểu đồ
           </button>
           <button
             onClick={() => setChartType('table')}
-            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${
-              chartType === 'table' ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-400'
-            }`}
+            className={`px-4 py-2 rounded-lg text-white font-semibold transition ${chartType === 'table' ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-400'}`}
           >
             Dạng bảng
           </button>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-md overflow-auto"> {/* Bo tròn và đổ bóng */}
+        <div className="bg-white p-4 rounded-lg shadow-md overflow-auto" style={{ maxHeight: '400px' }}>
           {chartType === 'table' ? (
             <table className="min-w-full bg-white border border-gray-200 rounded-md">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-4 border-b text-left font-medium text-gray-700">Thông số</th>
-                  {timeLabels.map((time) => (
-                    <th key={time} className="py-2 px-4 border-b text-left font-medium text-gray-700">
-                      {time}
-                    </th>
+              <thead className="sticky top-0 bg-gray-100 z-10"> {/* Sticky header implementation */}
+                <tr>
+                  <th className="py-2 px-4 border-b text-left font-medium text-gray-700">Giờ</th>
+                  {filteredSeries.map((serie) => (
+                    <th key={serie.name} className="py-2 px-4 border-b text-left font-medium text-gray-700">{serie.name}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredSeries.map((serie) => (
-                  <tr key={serie.name}>
-                    <td className="py-2 px-4 border-b text-gray-600">{serie.name}</td>
-                    {serie.data.map((value, index) => (
-                      <td key={index} className="py-2 px-4 border-b text-gray-600">{value}</td>
+                {timeLabels.map((time, timeIndex) => (
+                  <tr key={time}>
+                    <td className="py-2 px-4 border-b font-medium text-gray-700">{time}</td>
+                    {filteredSeries.map(serie => (
+                      <td key={`${serie.name}-${timeIndex}`} className="py-2 px-4 border-b text-gray-600">
+                        {serie.data[timeIndex]}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -164,7 +156,7 @@ function Evista() {
               options={chartData.options}
               series={filteredSeries}
               type={chartType}
-              height={254} // Giảm chiều cao của biểu đồ
+              height={254}
             />
           )}
         </div>

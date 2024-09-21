@@ -2,7 +2,7 @@
 
 const pondTypes = [
     {
-        name: 'Ao ươm',
+        name: 'Ao ương',
     },
     {
         name: 'Ao thương phẩm',

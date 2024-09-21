@@ -2,13 +2,13 @@
 
 const choosePondA = [
     {
-        name: 'Ao A1',
+        name: 'A01',
     },
     {
-        name: 'Ao A2',
+        name: 'A02',
     },
     {
-        name: 'Ao A3',
+        name: 'A03',
     }
 ];
 

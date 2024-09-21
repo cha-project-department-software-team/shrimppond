@@ -20,3 +20,6 @@ const infoRequestApi = {
         createShrimpLossRequest: async (data) => await axiosClient.post("/Update/Medicine", data)
     }
 }
+
+
+export default infoRequestApi;

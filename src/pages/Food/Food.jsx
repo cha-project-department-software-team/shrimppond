@@ -1,37 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { infoRequestApi } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 
 function Food() {
     const navigate = useNavigate();
-
     const [selectedPond, setSelectedPond] = useState("A1");
-
     const [pondData, setPondData] = useState({
-        A1: {
-            date: '',
-            rows: [{ name: "", type: "", quantity: "" }],
-            infoType: 'thucan',
-        },
-        A2: {
-            date: '',
-            rows: [{ name: "", type: "", quantity: "" }],
-            infoType: 'thucan',
-        },
-        A3: {
-            date: '',
-            rows: [{ name: "", type: "", quantity: "" }],
-            infoType: 'thucan',
-        }
+        A1: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' },
+        A2: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' },
+        A3: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' }
     });
-
     const [foodNames, setFoodNames] = useState(["Tên"]);
     const [foodTypes, setFoodTypes] = useState(["Loại"]);
     const [medicineNames, setMedicineNames] = useState(["Tên"]);
     const [medicineTypes, setMedicineTypes] = useState(["Loại"]);
-
     const [newName, setNewName] = useState("");
     const [newType, setNewType] = useState("");
+
+    const [foodHistory, setFoodHistory] = useState([]);
+    const [medicineHistory, setMedicineHistory] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleAddName = () => {
         if (pondData[selectedPond].infoType === 'thucan') {
@@ -43,7 +32,7 @@ function Food() {
                 setMedicineNames([...medicineNames, newName]);
             }
         }
-        setNewName(""); // Clear the input after adding
+        setNewName("");
     };
 
     const handleAddType = () => {
@@ -56,7 +45,7 @@ function Food() {
                 setMedicineTypes([...medicineTypes, newType]);
             }
         }
-        setNewType(""); // Clear the input after adding
+        setNewType("");
     };
 
     const handleAddRow = () => {
@@ -64,19 +53,22 @@ function Food() {
             ...prevData,
             [selectedPond]: {
                 ...prevData[selectedPond],
-                rows: [...prevData[selectedPond].rows, { name: "", type: "", quantity: "" }]
+                [pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']: [
+                    ...prevData[selectedPond][pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows'],
+                    { name: "", type: "", quantity: "" }
+                ]
             }
         }));
     };
 
     const handleRowChange = (index, field, value) => {
-        const updatedRows = [...pondData[selectedPond].rows];
+        const updatedRows = [...pondData[selectedPond][pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']];
         updatedRows[index][field] = value;
         setPondData((prevData) => ({
             ...prevData,
             [selectedPond]: {
                 ...prevData[selectedPond],
-                rows: updatedRows
+                [pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']: updatedRows
             }
         }));
     };
@@ -97,7 +89,7 @@ function Food() {
             [selectedPond]: {
                 ...prevData[selectedPond],
                 infoType: infoType
-                // Do not reset rows here
+                // Không reset rows ở đây
             }
         }));
     };
@@ -107,7 +99,20 @@ function Food() {
     };
 
     const handleUpdate = () => {
-        console.log("Data for pond", selectedPond, ":", pondData[selectedPond]);
+        const currentData = pondData[selectedPond];
+        const updateRecord = {
+            pond: selectedPond,
+            date: currentData.date,
+            infoType: currentData.infoType,
+            rows: [...(currentData.infoType === 'thucan' ? currentData.foodRows : currentData.medicineRows)]
+        };
+
+        if (currentData.infoType === 'thucan') {
+            setFoodHistory((prevHistory) => [...prevHistory, updateRecord]);
+        } else {
+            setMedicineHistory((prevHistory) => [...prevHistory, updateRecord]);
+        }
+
         alert(`Data for pond ${selectedPond} has been updated!`);
     };
 
@@ -116,6 +121,7 @@ function Food() {
     const quantityLabel = isThucAn ? 'Số lượng (kg)' : 'Liều lượng (g)';
     const names = isThucAn ? foodNames : medicineNames;
     const types = isThucAn ? foodTypes : medicineTypes;
+    const rows = isThucAn ? pondData[selectedPond].foodRows : pondData[selectedPond].medicineRows;
 
     return (
         <>
@@ -209,7 +215,7 @@ function Food() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pondData[selectedPond].rows.map((row, index) => (
+                                    {rows.map((row, index) => (
                                         <tr key={index} className={`bg-gray-${index % 2 === 0 ? '50' : '100'}`}>
                                             <td className="px-6 py-4 border-b border-gray-200">
                                                 <select
@@ -217,7 +223,7 @@ function Food() {
                                                     onChange={(e) => handleRowChange(index, 'name', e.target.value)}
                                                     className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                 >
-                                                    {names.map((name, i) => (
+                                                    {(isThucAn ? foodNames : medicineNames).map((name, i) => (
                                                         <option key={i} value={name}>{name}</option>
                                                     ))}
                                                 </select>
@@ -228,7 +234,7 @@ function Food() {
                                                     onChange={(e) => handleRowChange(index, 'type', e.target.value)}
                                                     className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                 >
-                                                    {types.map((type, i) => (
+                                                    {(isThucAn ? foodTypes : medicineTypes).map((type, i) => (
                                                         <option key={i} value={type}>{type}</option>
                                                     ))}
                                                 </select>
@@ -247,12 +253,77 @@ function Food() {
                                 </tbody>
                             </table>
                         </div>
-
-                        <div className="flex justify-between space-x-4 mt-4">
-                            <button onClick={handleAddRow} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">+ Thêm hàng</button>
-                            <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Cập nhật</button>
-                        </div>
                     </div>
+
+                    <div className="flex justify-between space-x-4 mt-4">
+                        <button onClick={handleAddRow} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">+ Thêm hàng</button>
+                        <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Cập nhật</button>
+                        <button 
+                            onClick={() => setIsModalOpen(true)} 
+                            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                        >
+                            Report
+                        </button>
+                    </div>
+
+                    {/* Modal hiển thị lịch sử cập nhật */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                            <div className="bg-white p-6 rounded-md shadow-lg w-1/2">
+                                <h2 className="text-xl font-semibold mb-4">Lịch sử cập nhật</h2>
+                                <h3 className="font-semibold mb-2">Thức ăn</h3>
+                                <ul className="max-h-64 overflow-y-auto">
+                                    {foodHistory.length === 0 ? (
+                                        <li className="text-gray-600">Không có lịch sử cập nhật thức ăn.</li>
+                                    ) : (
+                                        foodHistory.map((record, index) => (
+                                            <li key={index} className="mb-4 border-b pb-2">
+                                                <p><strong>Ao:</strong> {record.pond}</p>
+                                                <p><strong>Ngày:</strong> {record.date}</p>
+                                                <p><strong>Chi tiết:</strong></p>
+                                                <ul>
+                                                    {record.rows.map((row, idx) => (
+                                                        <li key={idx}>
+                                                            {row.name} - {row.type} - {row.quantity}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        ))
+                                    )}
+                                </ul>
+                                <h3 className="font-semibold mb-2">Thuốc</h3>
+                                <ul className="max-h-64 overflow-y-auto">
+                                    {medicineHistory.length === 0 ? (
+                                        <li className="text-gray-600">Không có lịch sử cập nhật thuốc.</li>
+                                    ) : (
+                                        medicineHistory.map((record, index) => (
+                                            <li key={index} className="mb-4 border-b pb-2">
+                                                <p><strong>Ao:</strong> {record.pond}</p>
+                                                <p><strong>Ngày:</strong> {record.date}</p>
+                                                <p><strong>Chi tiết:</strong></p>
+                                                <ul>
+                                                    {record.rows.map((row, idx) => (
+                                                        <li key={idx}>
+                                                            {row.name} - {row.type} - {row.quantity}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        ))
+                                    )}
+                                </ul>
+                                <div className="mt-4 flex justify-end">
+                                    <button 
+                                        onClick={() => setIsModalOpen(false)} 
+                                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                                    >
+                                        Đóng
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import useCallApi from '../../hooks/useCallApi';
 import React, { useState, useCallback, useEffect } from 'react';
-import { DashboardRequestApi } from '../../services/api';
-import CreateModal from '../../components/CreateModal'
+import { EvistaRequestApi } from '../../services/api';
 
 
 function Harvest (){
@@ -12,21 +11,22 @@ function Harvest (){
     const callApi = useCallApi();
 
     const [isCreateModal, setIsCreateModal] = useState(false)
+    const B01 = "B01"
 
-    const fetchData = useCallback(() => {
+    const fetchData = useCallback(
+      () => {
         callApi(
-          () => DashboardRequestApi.pondRequest.getPondRequest(), 
+          () => EvistaRequestApi.TemperatureRequest.getTempRequest(B01, "Temperature"), 
           (res) => {
             console.log(res)
           },
           "Lấy danh sách khối ao thất bại!"
         );
       }, [callApi]);
+
     useEffect(() => {
         fetchData();
     }, [fetchData]);
-
-    console.log(isCreateModal)
 
     
     return (
@@ -34,16 +34,8 @@ function Harvest (){
             <aside>
                 <Sidebar />
             </aside>
-            <button onClick = {prev => setIsCreateModal(!prev)}>
-              isCreateModal
-            </button>
 
-
-          <CreateModal 
-            isCreateModal = {isCreateModal}
-            setIsCreateModal = {setIsCreateModal}
-            onPostSuccess = {fetchData()}
-          />
+          
         </div>   
     )
 }
