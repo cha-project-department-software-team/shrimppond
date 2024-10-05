@@ -1,6 +1,6 @@
 import cl from 'classnames';
 import { useState, useRef, useEffect } from "react";
-import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
+// import { AiOutlineCaretDown, AiOutlineCaretUp } from 'react-icons/ai';
 
 function Dropdown({ items, buttonLabel, width = 192, height = 192, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -36,10 +36,10 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192, onChange }) {
     return (
         <div
             ref={dropdownRef}
-            style={{ width: `${width}px`, height: `${height}px` }}
+            style={{ width: `${width}px` }}
             className="relative flex flex-col items-center rounded-lg overflow-hidden"
         >
-            <button
+            <select
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cl(
                     "bg-white shadow-xl p-1 w-full flex items-center justify-between font-bold text-lg",
@@ -48,33 +48,25 @@ function Dropdown({ items, buttonLabel, width = 192, height = 192, onChange }) {
                 )}
             >
                 {selectedItem}
-                {!isOpen ? (
+                {/* {!isOpen ? (
                     <AiOutlineCaretDown className="h-8" />
                 ) : (
                     <AiOutlineCaretUp className="h-8" />
-                )}
-            </button>
-
-            {isOpen && (
-                <div
-                    ref={scrollRef}
-                    onWheel={handleScroll}
-                    className="absolute bg-white border border-1 border-gray-200 top-11 flex flex-col items-start rounded-lg p-1 w-full max-h-40 overflow-y-auto scroll-smooth no-scrollbar pb-4"
-                >
-                    {items.map((item, i) => (
-                        <div
+                )} */}
+                {items.map((item, i) => (
+                        <option
                             key={i}
                             onClick={() => handleItemClick(item)}
                             className={cl(
-                                "flex w-full hover:bg-gray-300 cursor-pointer rounded-r-lg",
+                                "flex w-full hover:bg-gray-300 cursor-pointer",
                                 "border-l-transparent hover:border-l-white border-l-4 p-1"
                             )}
+                            value = {item.name}
                         >
-                            <h3 className="font-bold">{item.name}</h3>
-                        </div>
-                    ))}
-                </div>
-            )}
+                            {item.name}
+                        </option>
+                ))}
+            </select>
         </div>
     );
 }
