@@ -5,11 +5,20 @@ import { extraActions } from '../../utils/constants'
 import DeleteCard from '../DeleteCard'
 import cl from "classnames"
 import ActiveCard from '../../components/ActiveCard'
+import { useNavigate } from 'react-router-dom';
+
 
 function Card({ pondId, status, onDeleteCardSuccess, onPutSucces }) {  // Không cần props actions từ 
   const [isActiveModal, setIsActiveModal] = useState(false)
   const [extra, setExtra] = useState(false);
   const [isDeleteCard, setIsDeleteCard] = useState(false)
+
+  const navigate = useNavigate()
+
+  const handleHarvestClick = (pondId) => {
+    // Điều hướng thẳng tới HarvestForm và truyền pondId qua state
+    navigate('/harvest', { state: { pondId } });
+};
 
 
   return (
@@ -65,6 +74,7 @@ function Card({ pondId, status, onDeleteCardSuccess, onPutSucces }) {  // Không
               className={`w-8 h-8 ${extraAction.bgColor} rounded-xl flex items-center justify-center cursor-pointer`}
               onClick = {() => {
                 if (extraAction.id === 5) {setIsDeleteCard(true)}
+                if (extraAction.id === 1) {handleHarvestClick(pondId)}
               }}
             >
               {extraAction.icon}

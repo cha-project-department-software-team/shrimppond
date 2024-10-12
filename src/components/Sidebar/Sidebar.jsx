@@ -25,11 +25,19 @@ function Sidebar() {
 
   const [active, setActive] = React.useState("Dashboard");
 
+  // Đặt document.title là "Dashboard" khi vừa vào trang hoặc khi trang là "/"
+  useLayoutEffect(() => {
+    if (location.pathname === "/") {
+      document.title = "Dashboard"; // Đặt title mặc định là Dashboard
+    }
+  }, [location.pathname]);
+
   useLayoutEffect(() => {
     const currentPath = location.pathname;
     const activeItem = menuItems.find(item => item.lnk === currentPath);
     if (activeItem) {
       setActive(activeItem.name);
+      document.title = activeItem.name; // Đặt title theo item đã chọn
     }
   }, [location.pathname, menuItems]);
 
@@ -63,6 +71,7 @@ function Sidebar() {
               onClick={() => {
                 setActive(item.name);
                 navigate(item.lnk);
+                document.title = item.name;  // Cập nhật tiêu đề trang khi chọn item
               }}
               className={`flex items-center relative py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group ${
                 active === item.name

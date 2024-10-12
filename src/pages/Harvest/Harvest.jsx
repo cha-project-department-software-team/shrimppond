@@ -7,13 +7,13 @@ function Harvest() {
     const callApi = useCallApi();
 
     return (
-        <div data-component="MainLayout" className="container flex h-screen overflow-hidden ">
+        <div className="container flex h-screen overflow-hidden ">
             <aside className="h-full">
                 <Sidebar />
             </aside>
             <div className="grow pt-5">
                 <div className="flex items-center px-5">
-                    <h1 className="text-5xl font-extrabold pb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 shadow-lg">
+                    <h1 className="text-5xl font-extrabold pb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
                         Thu hoạch
                     </h1>
                 </div>

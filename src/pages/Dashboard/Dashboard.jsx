@@ -47,6 +47,8 @@ function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+  
+  
 
   const handleSelected = (pondTypeName) => {
     setSelectedPondTypeName(pondTypeName); // Đặt tên khối được chọn
@@ -75,6 +77,7 @@ function Dashboard() {
           </div>
         </div>
 
+        
         {/* Hiển thị PondSummary cho từng pondType */}
         {pondTypes.map((pondType) => {
           // Lọc danh sách pond theo pondTypeId
