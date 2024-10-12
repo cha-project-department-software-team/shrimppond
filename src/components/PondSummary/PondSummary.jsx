@@ -59,7 +59,7 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
   }, []);
 
   return (
-    <div className="relative flex flex-col w-[90%] h-[30%] bg-white rounded-xl pb-1 border mt-1 shadow-xl">
+    <div className="relative flex flex-col w-full h-[189px] bg-white rounded-xl pb-1 border mt-1">
       <div className="flex text-3xl font-bold mb-1 justify-between p-1">
         
         <h1 className ="px-4">{pondTypeName}</h1>  

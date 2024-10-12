@@ -1,10 +1,10 @@
 import 'react-datepicker/dist/react-datepicker.css'; // Import CSS cho DatePicker
-import useCallApi from '../../hooks/useCallApi';
+// import useCallApi from '../../hooks/useCallApi';
 import Sidebar from '../../components/Sidebar';
 import HarvestForm from '../../components/HarvestForm'
 
 function Harvest() {
-    const callApi = useCallApi();
+    // const callApi = useCallApi();
 
     return (
         <div data-component="MainLayout" className="container flex h-screen overflow-hidden ">
