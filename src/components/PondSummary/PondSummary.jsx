@@ -59,9 +59,9 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
   }, []);
 
   return (
-    <div className="relative flex flex-col w-[90%] h-[30%] bg-white rounded-xl pb-1 border mt-1 shadow-xl">
+    <div className="relative flex flex-col w-full h-[189px] bg-white rounded-xl pb-1 border mt-1">
       <div className="flex text-3xl font-bold mb-1 justify-between p-1">
-        {/* Thay thế tiêu đề "Ao ươm" bằng pondTypeName */}
+        
         <h1 className ="px-4">{pondTypeName}</h1>  
         <span className="flex gap-x-3 pr-5">
           <FaTrashAlt 
@@ -79,7 +79,7 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
         </span>
       </div>
 
-      <div className={`overflow-hidden no-scrollbar px-5 h-full relative ${expanded ? "max-w-5xl" : "max-w-full"}`}>
+      <div className={`overflow-hidden no-scrollbar px-5 h-full relative w-[calc(100% - 50px)]`}>
         {showLeftArrow && (
           <div className="absolute top-0 w-24 h-full flex items-center left-0 z-10"
             style={{ background: 'linear-gradient(90deg, #fff 70%, transparent)' }}

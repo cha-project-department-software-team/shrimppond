@@ -59,7 +59,7 @@ function Dashboard() {
       <aside>
         <Sidebar />
       </aside>
-      <div className="flex-1 flex flex-col transition-all m-2 bg-slate-300 rounded-xl items-center max-w-[92%]">
+      <div className="flex-1 flex flex-col transition-all m-2 bg-slate-300 rounded-xl items-center w-full mr-2 overflow-hidden max-h-screen mb-2">
         <div className="flex w-[90%] h-32 rounded-xl gap-3 justify-around mt-3">
           <div className="flex flex-col items-center justify-center w-[18%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
             <h1 className="uppercase text-xl font-semibold">Tổng số ao</h1>
@@ -71,11 +71,13 @@ function Dashboard() {
           </div>
           <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
             <h1 className="uppercase text-xl font-semibold md:text-xl">Môi trường</h1>
-            <span className="font-bold text-4xl">Bổ điều</span>
+            <span className="font-bold text-4xl">Biểu đồ</span>
           </div>
         </div>
 
-        {/* Hiển thị PondSummary cho từng pondType */}
+
+        <div className ="w-[90%] max-h-[70%] overflow-hidden overflow-y-scroll no-scrollbar rounded-lg p-4">
+          {/* Hiển thị PondSummary cho từng pondType */}
         {pondTypes.map((pondType) => {
           // Lọc danh sách pond theo pondTypeId
           const filteredPonds = ponds.filter(pond => pond.pondTypeName === pondType.pondTypeName);
@@ -83,17 +85,20 @@ function Dashboard() {
           return (
             
               <PondSummary
-              onPutSucces = {fetchData}
-              key={pondType.pondTypeId} 
-              pondTypeName={pondType.pondTypeName} 
-              ponds={filteredPonds} 
-              setIsDeleteModal={setIsDeleteModal}
-              setIsCreateModal={setIsCreateModal}
-              onSelected={handleSelected} 
-              onDeleteCardSuccess={fetchData}
-            />
+                onPutSucces = {fetchData}
+                key={pondType.pondTypeId} 
+                pondTypeName={pondType.pondTypeName} 
+                ponds={filteredPonds} 
+                setIsDeleteModal={setIsDeleteModal}
+                setIsCreateModal={setIsCreateModal}
+                onSelected={handleSelected} 
+                onDeleteCardSuccess={fetchData}
+              />
+
           );
         })}
+        </div>
+        
 
         <FaMapMarkerAlt 
           onClick = {() => setShowImage(true)}

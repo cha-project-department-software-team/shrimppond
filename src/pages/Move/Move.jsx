@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 
+
 function Move (){
 
     const navigate = useNavigate()
@@ -12,7 +13,7 @@ function Move (){
                     <Sidebar />
                 </aside>
                 <div className = "">
-                    
+                   
                 </div>
                 
             </div>
