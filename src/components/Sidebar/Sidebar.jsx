@@ -11,8 +11,8 @@ function Sidebar() {
     { name: "Dashboard", icon: <BsGrid />, lnk: "/" },
     { name: "Thông số môi trường", icon: <BsDroplet />, lnk: "/evista" },
     { name: "Thu hoạch", icon: <BsBox />, lnk: "/harvest" },
-    { name: "Chuyển ao", icon: <BsShuffle />, lnk: "/move" },
-    { name: "Cập nhật thông tin", icon: <BsInfoCircle />, lnk: "/food" },
+    // { name: "Chuyển ao", icon: <BsShuffle />, lnk: "/move" },
+    // { name: "Cập nhật thông tin", icon: <BsInfoCircle />, lnk: "/food" },
     { name: "Truy xuất nguồn gốc", icon: <BsSearch />, lnk: "/access" },
     { name: "Thông tin trang trại", icon: <BsFileText />, lnk: "/status" },
   ];

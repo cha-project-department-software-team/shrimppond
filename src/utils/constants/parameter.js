@@ -2,11 +2,14 @@
 
 const parameter = [
     {
-        name: 'Nhiệt độ',
+        name: 'Temperature',
     },
     {
-        name: 'PH',
-    }
+        name: 'Ph',
+    },
+    {
+        name: 'O2'
+    },
 ];
 
 export default parameter;
