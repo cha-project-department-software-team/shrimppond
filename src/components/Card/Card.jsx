@@ -8,6 +8,7 @@ import ActiveCard from '../../components/ActiveCard'
 import { useNavigate } from 'react-router-dom';
 
 
+
 function Card({ pondId, status, onDeleteCardSuccess, onPutSucces }) {  // Không cần props actions từ 
   const [isActiveModal, setIsActiveModal] = useState(false)
   const [extra, setExtra] = useState(false);

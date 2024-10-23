@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { IoCalendar, IoDocument } from "react-icons/io5";
+import { IoCalendar, IoDocument } from 'react-icons/io5';
 import useCallApi from '../../hooks/useCallApi';
 import cl from 'classnames';
 import { DashboardRequestApi, HarvestRequest } from '../../services/api';
@@ -12,49 +12,58 @@ function HarvestForm() {
     const [harvestType, setHarvestType] = useState(0); // Harvest type (default 0)
     const [harvestDate, setHarvestDate] = useState(''); // ISO format date
     const [size, setSize] = useState(0); // Size of shrimp
-    const [harvestTime, setHarvestTime] = useState(0)
+    const [harvestTime, setHarvestTime] = useState(0); // Harvest time
     const [amount, setAmount] = useState(0); // Amount (biomass)
     const [certificates, setCertificates] = useState([]); // Array of certificate strings
-    const [ponds, setPonds] = useState([]); // State để lưu danh sách pondTypes
+    const [ponds, setPonds] = useState([]); // State to store pond list
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     const dateInputRef = useRef(null); // Reference to the date input
 
-    const callApi = useCallApi()
-    const location = useLocation()
+    const callApi = useCallApi();
+    const location = useLocation();
 
     useEffect(() => {
         if (location.state && location.state.pondId) {
             setPondId(location.state.pondId);
-            fetchData()
+            fetchData();
         }
     }, [location.state]);
 
-    const fetchData = useCallback(() => {
-        // if (!pondId) return; // Nếu chưa có pondId thì không gọi API
-    
+    const harvestData = useCallback(() => {
+        if (!pondId || pondId === '') return; // Skip if pondId is empty
+
         callApi(
             [
-                DashboardRequestApi.pondRequest.getPondRequest(),  // API lấy danh sách ao (ponds)
-                HarvestRequest.HarvestRequestApi.getHarvestTime(pondId),  // API lấy thời gian thu hoạch cho ao được chọn
+                HarvestRequest.HarvestRequestApi.getHarvestTime(pondId),  // Get harvest time by pondId
             ],
             (res) => {
-                setPonds(res[0]); // Lưu danh sách ponds vào state
-                console.log(res[0])
-                setHarvestTime(res[1].harvestTime); // Lưu giá trị thời gian thu hoạch vào state
-                console.log(pondId)
-                console.log(res[1].harvestTime)
-                console.log(res[1].amount)
+                setHarvestTime(res[0].harvestTime + 1); // Set harvest time
             },
-            "Lấy danh sách ao và thời gian thu hoạch thất bại!"  // Thông báo lỗi nếu có
+            'Failed to get pond list and harvest time!'  // Error message
         );
     }, [callApi, pondId]);
 
-    // Gọi hàm fetchData khi component được mount
+    useEffect(() => {
+        harvestData();
+    }, [harvestData, pondId]); // Re-fetch when pondId changes
+
+    const fetchData = useCallback(() => {
+        callApi(
+            [
+                DashboardRequestApi.pondRequest.getPondRequestByStatus(1),  // Get ponds list
+            ],
+            (res) => {
+                setPonds(res[0]); // Save ponds data
+            },
+            'Failed to get pond list!'  // Error message
+        );
+    }, [callApi]);
+
     useEffect(() => {
         fetchData();
-    }, [fetchData, pondId]); // Gọi lại fetchData mỗi khi pondId thay đổi    
+    }, [fetchData]); // Re-fetch when component mounts    
 
     const handleInputChange = (setter) => (e) => {
         setter(e.target.value);
@@ -66,55 +75,49 @@ function HarvestForm() {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                // Get the base64 string and remove the data URL scheme (MIME type prefix)
-                const base64String = reader.result.split(',')[1]; // Chỉ lấy phần base64 sau dấu ','
-                setCertificates([base64String]); // Store base64 string without the MIME type
+                const base64String = reader.result.split(',')[1]; // Remove data URL prefix
+                setCertificates([base64String]); // Store base64 string
             };
             reader.readAsDataURL(file); // Convert file to base64
         }
-      };
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Kiểm tra điều kiện các trường cần thiết
         if (!pondId || !harvestDate || amount <= 0 || size <= 0) {
             setErrorMessage('Vui lòng điền đầy đủ thông tin và đảm bảo giá trị hợp lệ!');
             return;
         }
 
-        // Chuẩn bị dữ liệu để post theo yêu cầu
         const data = {
             harvestType,
-            harvestDate: new Date(harvestDate).toISOString(), // Chuyển đổi ngày thành ISO format
-            amount,  // Biomass
-            size,  // Shrimp size
+            harvestDate: new Date(harvestDate).toISOString(), // Convert date to ISO format
+            amount,
+            size,
             certificates,
             pondId,
         };
 
-        setIsLoading(true); // Hiển thị trạng thái loading
         console.log(data)
 
-        // Gọi API để tạo mới thông tin harvest
+        setIsLoading(true);
         callApi(
-            () => DashboardRequestApi.pondRequest.createPondRequest(data), // POST data
+            () => HarvestRequest.HarvestRequestApi.postHarvest(data), // POST data
             (res) => {
-                // Xử lý khi thành công
                 setIsLoading(false);
-                setErrorMessage(''); // Xóa lỗi nếu có
+                setErrorMessage(''); // Clear error message on success
             },
-            'Thu hoạch đã được tạo thành công!', // Thông báo thành công
+            'Thu hoạch đã được tạo thành công!', // Success message
             (err) => {
-                // Xử lý lỗi
                 setIsLoading(false);
-                setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); // Hiển thị lỗi
+                setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!'); // Display error
             }
         );
     };
 
     const handleCalendarClick = () => {
-        dateInputRef.current.focus(); // Focusing là đủ
+        dateInputRef.current.focus(); // Focus on date input
     };
 
     return (
@@ -126,9 +129,9 @@ function HarvestForm() {
                         label="Chọn ao"
                         id="pondId"
                         value={pondId}
-                        onChange={handleInputChange(setPondId)}  // Cập nhật pondId
+                        onChange={handleInputChange(setPondId)}  // Update pondId
                         options={[
-                            { value: '', label: 'Chọn ao' },
+                            { value: '', label: 'Chọn ao' },  // Default value
                             ...ponds.map((pond) => ({ value: pond.pondId, label: pond.pondId }))
                         ]}
                     />
@@ -148,7 +151,11 @@ function HarvestForm() {
                         id="harvestType"
                         value={harvestType}
                         onChange={handleInputChange(setHarvestType)}
-                        options={[{ value: '', label: 'Chọn loại thu hoạch' }, { value: 0, label: 'Thu tỉa' }, { value: 1, label: 'Thu toàn bộ' }]}
+                        options={[
+                            { value: '', label: 'Chọn loại thu hoạch' },
+                            { value: 0, label: 'Thu tỉa' },
+                            { value: 1, label: 'Thu toàn bộ' }
+                        ]}
                     />
                 </div>
 
@@ -185,7 +192,7 @@ function HarvestForm() {
                                 type="file"
                                 id="certificates"
                                 multiple
-                                onChange={handleFileChange} // Lấy tên file để làm certificate
+                                onChange={handleFileChange} // Handle file change
                                 className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                             />
                             <span className="absolute text-2xl pr-3 right-0 flex items-center justify-items-center text-gray-400">
@@ -224,7 +231,7 @@ function HarvestForm() {
                 <div className="flex justify-center">
                     <button
                         type="submit"
-                        className={cl("bg-green-500 hover:bg-green-600 text-xl font-medium text-black py-2 px-6 rounded-md w-1/4", {
+                        className={cl('bg-green-500 hover:bg-green-600 text-xl font-medium text-black py-2 px-6 rounded-md w-1/4', {
                             'opacity-50 cursor-not-allowed': isLoading
                         })}
                         disabled={isLoading}
