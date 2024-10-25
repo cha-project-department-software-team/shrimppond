@@ -10,6 +10,8 @@ import CreateModal from '../../components/CreateModal'
 import ImageModal from '../../components/ImageModal'
 import { FaMapMarkerAlt  } from "react-icons/fa";
 import oxygen from '../../assets/image/oxygen.png'
+import { CiCirclePlus } from "react-icons/ci";
+
 
 
 function Dashboard() {
@@ -55,7 +57,7 @@ function Dashboard() {
   // const pondActive = ponds.map
 
   return (
-    <div className="flex">
+    <div className="flex max-h-screen">
       <aside>
         <Sidebar />
       </aside>
@@ -76,7 +78,7 @@ function Dashboard() {
         </div>
 
 
-        <div className ="w-[90%] max-h-[70%] overflow-hidden overflow-y-scroll no-scrollbar rounded-lg p-4">
+        <div className ="w-[90%] max-h-[75%] overflow-hidden overflow-y-scroll no-scrollbar rounded-lg p-4">
           {/* Hiển thị PondSummary cho từng pondType */}
         {pondTypes.map((pondType) => {
           // Lọc danh sách pond theo pondTypeId
@@ -104,15 +106,31 @@ function Dashboard() {
           onClick = {() => setShowImage(true)}
           className = "fixed top-5 right-5 text-4xl text-red-500"
         >
-          abcxyz
         </FaMapMarkerAlt>
 
-        <button
+        <button className ="h-10 w-10 right-4 items-center rounded-2xl bottom-5 fixed bg-[#61CBF4]/[.90] flex justify-center">
+          <CiCirclePlus
+            onClick={() => { setIsModal(true); }}
+            className='h-12 text-3xl text-black'
+          >
+          </CiCirclePlus>
+          <div className="flex items-center justify-center text-black font-bold">     
+                   <div className={`
+                      absolute right-full rounded-md -px-2 -py-1 ml-6 whitespace-nowrap
+                      bg-indigo-100 text-indigo-800
+                      invisible opacity-20 -translate-x-3 transition-all
+                      group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 group-hover:z-50
+                    `}>Tạo khối</div>
+              </div>
+        </button>
+
+        {/* <button
           onClick={() => { setIsModal(true); }}
           className="fixed bottom-5 w-1/6 rounded-2xl h-12 bg-[#61CBF4]/[.90] cursor-pointer"
         >
           <h1 className = "text-xl font-bold">Tạo khối</h1>
-        </button>
+        </button> */}
+
         {isModal && <Modal
           setIsModal={setIsModal}
           onPostSuccess={fetchData} // Truyền callback để fetch dữ liệu sau POST
