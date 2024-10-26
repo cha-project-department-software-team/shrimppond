@@ -9,23 +9,55 @@ import jsPDF from 'jspdf';
 function Access() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [lotOptions, setLotOptions] = useState([]); // State for lot options
+  const [harvestTimeOptions, setHarvestTimeOptions] = useState([]); // State for harvest times
   const [selectedLot, setSelectedLot] = useState('');
-  const [selectedPond, setSelectedPond] = useState('');
+  const [selectedHarvestTime, setSelectedHarvestTime] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
 
+  // Fetch lot options from the first API
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchLotOptions = async () => {
       try {
-        const response = await axios.get(
-          'http://shrimppond.runasp.net/api/Traceability?SeedId=2112666&HarvestTime=2&pageSize=200&pageNumber=1'
-        );
-        setData(response.data);
+        const response = await axios.get('http://shrimppond.runasp.net/api/Traceability/GetSeedId?pageSize=200&pageNumber=1');
+        setLotOptions(response.data.map(lot => ({ id: lot.seedId, label: lot.seedId })));
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        console.error('Error fetching lot options: ', error);
       }
     };
-    fetchData();
+
+    fetchLotOptions(); // Fetch the lot options on component mount
   }, []);
+
+  // Fetch harvest time options from the second API
+  useEffect(() => {
+    const fetchHarvestTimes = async () => {
+      try {
+        const response = await axios.get('http://shrimppond.runasp.net/api/Traceability/GetTimeHarvest?pageSize=200&pageNumber=1');
+        setHarvestTimeOptions(response.data.map(time => ({ id: time.harvestTime, label: time.harvestTime})));
+      } catch (error) {
+        console.error('Error fetching harvest times: ', error);
+      }
+    };
+
+    fetchHarvestTimes(); // Fetch the harvest times on component mount
+  }, []);
+
+  const fetchData = async () => {
+    if (!selectedLot || !selectedHarvestTime) {
+      alert('Please select both a lot and a harvest time.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://shrimppond.runasp.net/api/Traceability?SeedId=${selectedLot}&HarvestTime=${selectedHarvestTime}&pageSize=200&pageNumber=1`
+      );
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  };
 
   const generateQRCodeData = () => {
     if (!data) return '';
@@ -42,11 +74,10 @@ function Access() {
     ].join('\n');
   };
 
-  // Convert base64 certificate to PDF and download
   const downloadCertificateAsPDF = (base64, index) => {
     const pdf = new jsPDF();
-    pdf.addImage(base64, 'JPEG', 10, 10, 180, 160); // Add the image to the PDF
-    pdf.save(`Certificate_${index + 1}.pdf`); // Save the PDF
+    pdf.addImage(base64, 'JPEG', 10, 10, 180, 160);
+    pdf.save(`Certificate_${index + 1}.pdf`);
   };
 
   return (
@@ -66,33 +97,37 @@ function Access() {
               <option value="" disabled>
                 Lô
               </option>
-              <option value="lot1">Mã lô 1</option>
-              <option value="lot2">Mã lô 2</option>
-              <option value="lot3">Mã lô 3</option>
+              {lotOptions.map((lot) => (
+                <option key={lot.id} value={lot.id}>
+                  {lot.label}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="w-1/3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn ao</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Lần thu hoạch</label>
             <select
               className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={selectedPond}
-              onChange={(e) => setSelectedPond(e.target.value)}
+              value={selectedHarvestTime}
+              onChange={(e) => setSelectedHarvestTime(e.target.value)}
             >
               <option value="" disabled>
-                Chọn ao
+                Chọn lần thu hoạch
               </option>
-              <option value="A01">A01</option>
-              <option value="A02">A02</option>
-              <option value="A03">A03</option>
-              <option value="B01">B01</option>
-              <option value="B02">B02</option>
-              <option value="B03">B03</option>
+              {harvestTimeOptions.map((time) => (
+                <option key={time.id} value={time.id}>
+                  {time.label}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="flex items-center w-1/3">
-            <button className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
+            <button 
+              className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+              onClick={fetchData}
+            >
               <FaSearch />
             </button>
           </div>
@@ -102,45 +137,45 @@ function Access() {
           <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã lô</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã ao</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lần thu hoạch</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng thu hoạch</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size tôm</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giấy chứng nhận</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số ngày nuôi</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trang trại</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</th>
-              </tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã lô</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã ao</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lần thu hoạch</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng thu hoạch</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size tôm</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giấy chứng nhận</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số ngày nuôi</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trang trại</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</th>
+                </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.seedId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestPondId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestTime}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.totalAmount}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.size}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {data.certificates.map((base64, index) => (
-                    <div key={index} className="mb-1">
-                      <a
-                        href={`data:application/pdf;base64,${base64}`}
-                        download={`Certificate_${index + 1}.pdf`}
-                        className="text-blue-500 underline"
-                      >
-                        Download Certificate {index + 1}
-                      </a>
-                    </div>
-                  ))}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.daysOfRearing}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.farmName}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
-              </tr>
+                <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.seedId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestPondId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestTime}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.totalAmount}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.size}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {data.certificates.map((base64, index) => (
+                        <div key={index} className="mb-1">
+                          <a
+                            href={`data:application/pdf;base64,${base64}`}
+                            download={`Certificate_${index + 1}.pdf`}
+                            className="text-blue-500 underline"
+                          >
+                            Download Certificate {index + 1}
+                          </a>
+                        </div>
+                      ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.daysOfRearing}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.farmName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
+                  </tr>
             </tbody>
           </table>
         ) : (
-          <p>Loading data...</p>
+          <p>Vui lòng chọn mã lô và số lần thu hoạch.</p>
         )}
 
         <div className="flex flex-col items-center mt-6">
