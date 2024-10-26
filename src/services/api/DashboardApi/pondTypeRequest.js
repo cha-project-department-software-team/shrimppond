@@ -16,6 +16,7 @@ const DashboardRequestApi = {
         createPondRequest: async (data) => await axiosClient.post("Pond/CreatePond", data),
         updatePondRequest: async (data) => await axiosClient.put("/Pond/ActivePond", data),
         deletePondRequest: async (id) => await axiosClient.delete(`Pond?PondId=${id}`),
+        getHarvestTime: async (data) => await axiosClient.get(`/Pond/GetHarvestTime?pondId=${data}`),
     }
 
 }
