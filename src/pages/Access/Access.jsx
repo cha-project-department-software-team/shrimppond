@@ -180,7 +180,7 @@ function Access() {
 
         <div className="flex flex-col items-center mt-6">
           <button
-            className="bg-green-500 text-white font-semibold py-2 px-6 rounded-md mt-4 w-1/4"
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-md mt-4 w-1/4"
             onClick={() => setShowQRCode(true)}
           >
             Xuất QR
