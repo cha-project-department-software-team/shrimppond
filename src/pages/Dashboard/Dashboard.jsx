@@ -61,17 +61,17 @@ function Dashboard() {
       <aside>
         <Sidebar />
       </aside>
-      <div className="flex-1 flex flex-col transition-all m-2 bg-slate-300 rounded-xl items-center w-full mr-2 overflow-hidden max-h-screen mb-2">
+      <div className="flex-1 flex flex-col transition-all m-2 rounded-xl items-center w-full mr-2 overflow-hidden max-h-screen mb-2">
         <div className="flex w-[90%] h-32 rounded-xl gap-3 justify-around mt-3">
-          <div className="flex flex-col items-center justify-center w-[18%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
+          <div className="flex flex-col items-center justify-center w-[18%] h-full max-w-[90%] max-h-[90%] rounded-xl drop-shadow-2xl bg-white">
             <h1 className="uppercase text-xl font-semibold">Tổng số ao</h1>
             <span className="font-bold text-5xl">{ponds.length}</span> {/* Hiển thị tổng số khối ao */}
           </div>
-          <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
+          <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl drop-shadow-2xl bg-white">
             <h1 className="uppercase text-xl font-semibold md:text-xl">Số ao nuôi</h1>
             <span className="font-bold text-5xl text-green-600/[.86]">{activePonds}</span> {/* Tùy chỉnh số ao nuôi */}
           </div>
-          <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl border-2 shadow-xl border-sky-500 bg-white">
+          <div className="flex flex-col items-center justify-center w-[20%] h-full max-w-[90%] max-h-[90%] rounded-xl drop-shadow-2xl bg-white">
             <h1 className="uppercase text-xl font-semibold md:text-xl">Môi trường</h1>
             <span className="font-bold text-4xl">Biểu đồ</span>
           </div>
