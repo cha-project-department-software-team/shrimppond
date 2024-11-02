@@ -124,7 +124,7 @@ function HarvestForm() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
+        <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl mx-auto h-[90%] mt-5">
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <SelectField
