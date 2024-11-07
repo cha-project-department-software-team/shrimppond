@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import { FaTrashAlt } from 'react-icons/fa';
+import useCallApi from '../../hooks/useCallApi';
+import { DashboardRequestApi} from '../../services/api';
 
 function SetTime({ setIsSetTime, onPostSuccess }) { 
     const [timeFields, setTimeFields] = useState([{ hour: "", minute: "" }]);
@@ -9,6 +11,8 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState({});
     const dropdownRefs = useRef([]); // Tạo mảng refs cho từng dropdown
+
+    const callApi = useCallApi()
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {
@@ -49,7 +53,22 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 }))
             };
             setIsLoading(true);
-            console.log(data); // Dữ liệu sẽ được gửi lên API
+            callApi(
+                () => DashboardRequestApi.timeRequest.setTimeRequest(data),
+                (res) => {
+                    setIsLoading(false);
+                    setErrorMessage('');
+                },
+                'Thu hoạch đã được tạo thành công!',
+                (err) => {
+                    setIsLoading(false);
+                    if (err.response && err.response.data && err.response.data.title) {
+                        setErrorMessage(err.response.data.title);
+                    } else {
+                        setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!');
+                    }
+                }
+            );
 
             // Gọi API tại đây
             setIsLoading(false);
@@ -81,7 +100,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     return (
         <div 
             className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50")} 
-            onClick={handleCloseModal}
+            // onClick={handleCloseModal}
         >
             <div
             className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">
