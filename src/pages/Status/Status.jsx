@@ -8,10 +8,12 @@ function StatusPage() {
     const [farms, setFarms] = useState([]);
     const [farmName, setFarmName] = useState('');
     const [farmAddress, setFarmAddress] = useState('');
+    const [loading, setLoading] = useState(false); // Loading state
 
     // Gọi API để lấy danh sách trang trại
     useEffect(() => {
         const fetchFarms = async () => {
+            setLoading(true); // Start loading
             const url = 'http://shrimppond.runasp.net/api/Farm?pageSize=200&pageNumber=1';
             try {
                 const response = await axios.get(url);
@@ -23,6 +25,8 @@ function StatusPage() {
                 setFarms(farmData);
             } catch (error) {
                 console.error('Failed to fetch farms:', error);
+            } finally {
+                setLoading(false); // End loading
             }
         };
 
@@ -102,22 +106,27 @@ function StatusPage() {
                         </button>
                     </form>
 
-                    <div>
-                        <h2 className="text-lg font-semibold">Danh sách trang trại</h2>
-                        <div className="max-h-56 overflow-y-auto divide-y divide-gray-200">
-                            {farms.map(farm => (
-                                <div key={farm.id} className="flex justify-between items-center p-2">
-                                    <span>{farm.name} - {farm.address}</span>
-                                    <button
-                                        className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                                        onClick={() => deleteFarm(farm.name)}
-                                    >
-                                        Xóa
-                                    </button>
-                                </div>
-                            ))}
+                    {/* Loading message */}
+                    {loading ? (
+                        <div className="text-center text-gray-500">Loading data...</div>
+                    ) : (
+                        <div>
+                            <h2 className="text-lg font-semibold">Danh sách trang trại</h2>
+                            <div className="max-h-56 overflow-y-auto divide-y divide-gray-200">
+                                {farms.map(farm => (
+                                    <div key={farm.id} className="flex justify-between items-center p-2">
+                                        <span>{farm.name} - {farm.address}</span>
+                                        <button
+                                            className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                                            onClick={() => deleteFarm(farm.name)}
+                                        >
+                                            Xóa
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                 </div>
             </div>

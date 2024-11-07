@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import axios from 'axios';
@@ -9,13 +9,17 @@ import jsPDF from 'jspdf';
 function Access() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
-  const [lotOptions, setLotOptions] = useState([]); // State for lot options
-  const [harvestTimeOptions, setHarvestTimeOptions] = useState([]); // State for harvest times
+  const [lotOptions, setLotOptions] = useState([]);
+  const [harvestTimeOptions, setHarvestTimeOptions] = useState([]);
   const [selectedLot, setSelectedLot] = useState('');
   const [selectedHarvestTime, setSelectedHarvestTime] = useState('');
   const [showQRCode, setShowQRCode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // Create a reference for the QR code canvas
+  const qrCodeRef = useRef(null);
 
-  // Fetch lot options from the first API
+  // Fetch lot options
   useEffect(() => {
     const fetchLotOptions = async () => {
       try {
@@ -25,22 +29,20 @@ function Access() {
         console.error('Error fetching lot options: ', error);
       }
     };
-
-    fetchLotOptions(); // Fetch the lot options on component mount
+    fetchLotOptions();
   }, []);
 
-  // Fetch harvest time options from the second API
+  // Fetch harvest time options
   useEffect(() => {
     const fetchHarvestTimes = async () => {
       try {
         const response = await axios.get('http://shrimppond.runasp.net/api/Traceability/GetTimeHarvest?pageSize=200&pageNumber=1');
-        setHarvestTimeOptions(response.data.map(time => ({ id: time.harvestTime, label: time.harvestTime})));
+        setHarvestTimeOptions(response.data.map(time => ({ id: time.harvestTime, label: time.harvestTime })));
       } catch (error) {
         console.error('Error fetching harvest times: ', error);
       }
     };
-
-    fetchHarvestTimes(); // Fetch the harvest times on component mount
+    fetchHarvestTimes();
   }, []);
 
   const fetchData = async () => {
@@ -48,7 +50,7 @@ function Access() {
       alert('Please select both a lot and a harvest time.');
       return;
     }
-
+    setLoading(true);
     try {
       const response = await axios.get(
         `http://shrimppond.runasp.net/api/Traceability?SeedId=${selectedLot}&HarvestTime=${selectedHarvestTime}&pageSize=200&pageNumber=1`
@@ -56,6 +58,8 @@ function Access() {
       setData(response.data);
     } catch (error) {
       console.error('Error fetching data: ', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,6 +78,15 @@ function Access() {
     ].join('\n');
   };
 
+  const downloadQRCode = () => {
+    const canvas = qrCodeRef.current;
+    const imageURI = canvas.toDataURL("image/png"); // Convert canvas to data URL
+    const link = document.createElement("a");
+    link.href = imageURI;
+    link.download = "QRCode.png"; // Name for the downloaded file
+    link.click(); // Trigger the download
+  };
+
   const downloadCertificateAsPDF = (base64, index) => {
     const pdf = new jsPDF();
     pdf.addImage(base64, 'JPEG', 10, 10, 180, 160);
@@ -90,7 +103,7 @@ function Access() {
           <div className="w-1/3">
             <label className="block text-sm font-medium text-gray-700 mb-2">Lô</label>
             <select
-              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"
               value={selectedLot}
               onChange={(e) => setSelectedLot(e.target.value)}
             >
@@ -108,7 +121,7 @@ function Access() {
           <div className="w-1/3">
             <label className="block text-sm font-medium text-gray-700 mb-2">Lần thu hoạch</label>
             <select
-              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"
               value={selectedHarvestTime}
               onChange={(e) => setSelectedHarvestTime(e.target.value)}
             >
@@ -124,54 +137,57 @@ function Access() {
           </div>
 
           <div className="flex items-center w-1/3">
-            <button 
+            <button
               className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
               onClick={fetchData}
+              disabled={loading}
             >
               <FaSearch />
             </button>
           </div>
         </div>
 
-        {data ? (
+        {loading ? (
+          <p>Loading data...</p>
+        ) : data ? (
           <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã lô</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã ao</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lần thu hoạch</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng thu hoạch</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size tôm</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giấy chứng nhận</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số ngày nuôi</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trang trại</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</th>
-                </tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã lô</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã ao</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lần thu hoạch</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng thu hoạch</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size tôm</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giấy chứng nhận</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số ngày nuôi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trang trại</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</th>
+              </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-                <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.seedId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestPondId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestTime}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.totalAmount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.size}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {data.certificates.map((base64, index) => (
-                        <div key={index} className="mb-1">
-                          <a
-                            href={`data:application/pdf;base64,${base64}`}
-                            download={`Certificate_${index + 1}.pdf`}
-                            className="text-blue-500 underline"
-                          >
-                            Download Certificate {index + 1}
-                          </a>
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.daysOfRearing}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.farmName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
-                  </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.seedId}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestPondId}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.harvestTime}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.totalAmount}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.size}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {data.certificates.map((base64, index) => (
+                    <div key={index} className="mb-1">
+                      <a
+                        href={`data:application/pdf;base64,${base64}`}
+                        download={`Certificate_${index + 1}.pdf`}
+                        className="text-blue-500 underline"
+                      >
+                        Download Certificate {index + 1}
+                      </a>
+                    </div>
+                  ))}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.daysOfRearing}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.farmName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.address}</td>
+              </tr>
             </tbody>
           </table>
         ) : (
@@ -185,9 +201,9 @@ function Access() {
           >
             Xuất QR
           </button>
-          {showQRCode && (
-            <div className="mt-4 p-4 bg-white shadow-lg rounded-lg">
-              <QRCodeCanvas value={generateQRCodeData()} size={200} />
+          {showQRCode && data && (
+            <div className="mt-4 p-4 bg-white shadow-lg rounded-lg" onClick={downloadQRCode}>
+              <QRCodeCanvas ref={qrCodeRef} value={generateQRCodeData()} size={200} />
             </div>
           )}
         </div>
