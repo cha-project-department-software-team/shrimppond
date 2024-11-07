@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -8,8 +8,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState({});
-
-    const dropdownRefs = useRef([]); // Mảng refs cho từng dropdown
+    const dropdownRefs = useRef([]); // Tạo mảng refs cho từng dropdown
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {
@@ -52,7 +51,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
             setIsLoading(true);
             console.log(data); // Dữ liệu sẽ được gửi lên API
 
-            // Đoạn code gọi API có thể được đặt ở đây
+            // Gọi API tại đây
             setIsLoading(false);
             onPostSuccess();
             setIsSetTime(false);
@@ -64,9 +63,11 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            const isScrollbarClick = event.target.classList.contains('overflow-y-auto');
-            // Đóng dropdown khi nhấp ngoài vùng dropdown
-            if (!isScrollbarClick && !dropdownRefs.current.some(ref => ref && ref.contains(event.target))) {
+            // Kiểm tra nếu nhấp bên ngoài dropdown (trừ scrollbar)
+            if (
+                !event.target.classList.contains('overflow-y-auto') &&
+                !dropdownRefs.current.some(ref => ref && ref.contains(event.target))
+            ) {
                 setDropdownVisible({});
             }
         };
@@ -75,13 +76,15 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+    
 
     return (
         <div 
             className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50")} 
             onClick={handleCloseModal}
         >
-            <div className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">
+            <div
+            className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">
                 <i 
                     className="absolute top-0 right-0 text-2xl p-3 cursor-pointer hover:bg-gray-400 rounded-full"
                     onClick={() => setIsSetTime(false)}
@@ -90,9 +93,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 </i>
                 <header className="text-xl font-bold text-center uppercase mb-4">Thiết Lập Thời Gian</header>
 
-                <form onSubmit={handleSubmit}
-                    className ="max-h-[500px] overflow-y-auto"
-                >
+                <form onSubmit={handleSubmit}>
                     {timeFields.map((time, index) => (
                         <div className="flex mb-4 items-center space-x-2" key={index}>
                             <h2 className='font-semibold'>Thiết lập lần đo {index + 1}</h2>
@@ -147,12 +148,10 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                                 )}
                             </div>
 
-                            <FaTrashAlt
+                            <FaTrashAlt 
                                 className="text-red-500 font-bold ml-2" 
                                 onClick={() => handleRemoveTimeField(index)}
-                            >
-                                Xóa
-                            </FaTrashAlt>
+                            />
                         </div>
                     ))}
 
