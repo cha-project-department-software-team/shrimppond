@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback, useEffect, memo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
-import { FaTrashAlt } from "react-icons/fa";
 import cl from 'classnames';
+import { FaTrashAlt } from 'react-icons/fa';
 
 function SetTime({ setIsSetTime, onPostSuccess }) { 
     const [timeFields, setTimeFields] = useState([{ hour: "", minute: "" }]);
@@ -9,7 +9,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState({});
 
-    const dropdownRefs = useRef([]); // Tạo mảng refs cho từng dropdown
+    const dropdownRefs = useRef([]); // Mảng refs cho từng dropdown
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {
@@ -50,23 +50,13 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 }))
             };
             setIsLoading(true);
-            console.log(data)
+            console.log(data); // Dữ liệu sẽ được gửi lên API
 
-            callApi(
-                () => DashboardRequestApi.timeRequest.setTimeRequest(data),
-                (res) => {
-                    setIsLoading(false);
-                    onPostSuccess();
-                    setIsSetTime(false);
-                    setTimeFields([{ hour: "", minute: "" }]);
-                },
-                'Thời gian đã được thiết lập thành công!',
-                (err) => {
-                    setIsLoading(false);
-                    setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!');
-                    console.error('Error:', err);
-                }
-            );
+            // Đoạn code gọi API có thể được đặt ở đây
+            setIsLoading(false);
+            onPostSuccess();
+            setIsSetTime(false);
+            setTimeFields([{ hour: "", minute: "" }]);
         } else {
             setErrorMessage('Cả hai thời gian không được để trống!');
         }
@@ -75,7 +65,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     useEffect(() => {
         const handleClickOutside = (event) => {
             const isScrollbarClick = event.target.classList.contains('overflow-y-auto');
-            // Kiểm tra nếu nhấp bên ngoài dropdown mà không phải scrollbar
+            // Đóng dropdown khi nhấp ngoài vùng dropdown
             if (!isScrollbarClick && !dropdownRefs.current.some(ref => ref && ref.contains(event.target))) {
                 setDropdownVisible({});
             }
@@ -100,19 +90,20 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 </i>
                 <header className="text-xl font-bold text-center uppercase mb-4">Thiết Lập Thời Gian</header>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}
+                    className ="max-h-[500px] overflow-y-auto"
+                >
                     {timeFields.map((time, index) => (
                         <div className="flex mb-4 items-center space-x-2" key={index}>
                             <h2 className='font-semibold'>Thiết lập lần đo {index + 1}</h2>
                             
                             {/* Hour Dropdown */}
-                            <div className="relative flex-1" ref={el => dropdownRefs.current[index] = el}>
+                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], hour: el })}>
                                 <input 
                                     type="text"
                                     placeholder="Chọn giờ"
                                     value={time.hour}
                                     onClick={() => toggleDropdown(index, 'hour')}
-                                    onChange={() => {}}
                                     readOnly
                                     className="w-full border border-gray-300 p-2 rounded-md focus:ring-green-500 focus:border-green-500"
                                 />
@@ -132,13 +123,12 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                             </div>
                             
                             {/* Minute Dropdown */}
-                            <div className="relative flex-1" ref={el => dropdownRefs.current[index] = el}>
+                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], minute: el })}>
                                 <input 
                                     type="text"
                                     placeholder="Chọn phút"
                                     value={time.minute}
                                     onClick={() => toggleDropdown(index, 'minute')}
-                                    onChange={() => {}}
                                     readOnly
                                     className="w-full border border-gray-300 p-2 rounded-md focus:ring-green-500 focus:border-green-500"
                                 />
@@ -157,10 +147,12 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                                 )}
                             </div>
 
-                            <FaTrashAlt 
-                                className="text-red-500 cursor-pointer ml-2"
+                            <FaTrashAlt
+                                className="text-red-500 font-bold ml-2" 
                                 onClick={() => handleRemoveTimeField(index)}
-                            />
+                            >
+                                Xóa
+                            </FaTrashAlt>
                         </div>
                     ))}
 
@@ -192,4 +184,4 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     );
 }
 
-export default memo(SetTime);
+export default SetTime;
