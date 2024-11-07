@@ -27,7 +27,6 @@ function Card({ pondId, status, onDeleteCardSuccess, onPutSucces }) {
         (res) => {
           setHarvestTime(res[0].harvestTime); // Set harvest time
         },
-        'Failed to get pond list and harvest time!'  // Error message
     );
 }, [callApi, pondId]);
 

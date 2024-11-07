@@ -48,7 +48,7 @@ const useCallApi = () => {
                         if (typeof reject === "function") {
                             reject(err)
                         }
-                        toast.error("Thao tác không thành công, vui lòng thử lại")
+                        // toast.error("Thao tác không thành công, vui lòng thử lại")
                     })
                     // .finally(() => {
                     //     dispatch(commonStoreActions.setLoading(false))

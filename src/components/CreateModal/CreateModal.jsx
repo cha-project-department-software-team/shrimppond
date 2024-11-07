@@ -4,15 +4,13 @@ import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi';
 import { DashboardRequestApi } from '../../services/api';
 
-function CreateModal({ isCreateModal, setIsCreateModal, onPostSuccess, pondTypeName }) { 
+function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) { 
     const [pondId, setPondId] = useState(''); // State để lưu giá trị của pondId và pondTypeId
     const [deep, setDeep] = useState(0); // State để lưu giá trị độ sâu (deep)
     const [diameter, setDiameter] = useState(0); // State để lưu giá trị đường kính (diameter)
     const [errorMessage, setErrorMessage] = useState(''); // State lưu lỗi
     const [isLoading, setIsLoading] = useState(false); // State xử lý khi submit
     const callApi = useCallApi(); // Khởi tạo hook useCallApi
-
-    if (!isCreateModal) return null; // Không render CreateModal nếu isCreateModal là false
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {

@@ -4,6 +4,8 @@ import cl from 'classnames';
 import { FaTrashAlt } from 'react-icons/fa';
 import useCallApi from '../../hooks/useCallApi';
 import { DashboardRequestApi} from '../../services/api';
+import { ToastContainer, toast } from "react-toastify"; // Import thêm toast
+import 'react-toastify/dist/ReactToastify.css'
 
 function SetTime({ setIsSetTime, onPostSuccess }) { 
     const [timeFields, setTimeFields] = useState([{ hour: "", minute: "" }]);
@@ -58,9 +60,11 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 (res) => {
                     setIsLoading(false);
                     setErrorMessage('');
+                    
                 },
-                'Thu hoạch đã được tạo thành công!',
+                "Đã thiết lập thời gian thành",
                 (err) => {
+                    
                     setIsLoading(false);
                     if (err.response && err.response.data && err.response.data.title) {
                         setErrorMessage(err.response.data.title);
@@ -198,6 +202,7 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                     </div>
                 </form>
             </div>
+            
         </div>
     );
 }

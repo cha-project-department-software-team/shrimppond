@@ -4,13 +4,13 @@ import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi'; // Hook đã có sẵn
 import { DashboardRequestApi } from '../../services/api';
 
-function DeleteModal({ isDeleteModal, setIsDeleteModal, pondTypeName, onDeleteSuccess }) { 
+function DeleteModal({ setIsDeleteModal, pondTypeName, onDeleteSuccess }) { 
     const [confirmPondTypeName, setConfirmPondTypeName] = useState(''); // Lưu tên khối nhập để xác nhận
     const [errorMessage, setErrorMessage] = useState(''); // Lưu thông báo lỗi
     const [isLoading, setIsLoading] = useState(false); // Xử lý trạng thái đang tải
     const callApi = useCallApi();
 
-    if (!isDeleteModal) return null;
+    
 
     const handleCloseModal = (e) => {
         if (e.target === e.currentTarget) {

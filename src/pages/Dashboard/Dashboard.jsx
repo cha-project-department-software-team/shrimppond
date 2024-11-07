@@ -13,6 +13,9 @@ import ImageModal from '../../components/ImageModal'
 import { FaMapMarkerAlt  } from "react-icons/fa";
 import oxygen from '../../assets/image/oxygen.png'
 import { CiCirclePlus } from "react-icons/ci";
+import Loading from '../../components/Loading';
+import { ToastContainer, toast } from "react-toastify"; // Import thêm toast
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -24,12 +27,16 @@ function Dashboard() {
   const [isCreateModal, setIsCreateModal] = useState(false)
   const [isSetTime, setIsSetTime] = useState(false)
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
   const [showImage ,setShowImage] = useState(false)
   const [activePonds, setActivePonds] = useState(0)
   const [pondTypes, setPondTypes] = useState([]); // State để lưu danh sách pondTypes
   const [ponds, setPonds] = useState([]); // State để lưu danh sách pondTypes
   const [selectedPondTypeName, setSelectedPondTypeName] = useState(''); // State để lưu tên khối được chọn để xóa
 
+
+  const handleLoading = () => {setIsLoading(false)}
+  
   // Hàm lấy dữ liệu PondType từ API
   const fetchData = useCallback(() => {
     callApi(
@@ -37,27 +44,26 @@ function Dashboard() {
         DashboardRequestApi.pondTypeRequest.getPondTypeRequest(),
         DashboardRequestApi.pondRequest.getPondRequest(),
         DashboardRequestApi.pondRequest.getPondRequestByStatus(1),
-
+        handleLoading()
       ], 
       (res) => {
         setPondTypes(res[0]); // Lưu dữ liệu vào state pondTypes
         setPonds(res[1]); // Lưu dữ liệu vào state ponds
         setActivePonds(res[2].length)
+
       },
-      "Lấy danh sách khối ao thất bại!"
     );
   }, [callApi]);
 
   // Gọi hàm fetchData khi component được mount
   useEffect(() => {
-    fetchData();
+    fetchData()
   }, [fetchData]);
 
   const handleSelected = (pondTypeName) => {
     setSelectedPondTypeName(pondTypeName); // Đặt tên khối được chọn
   };
 
-  // const pondActive = ponds.map
 
   return (
     <div className="flex max-h-screen">
@@ -130,27 +136,32 @@ function Dashboard() {
 
 
         {isSetTime && <SetTime 
-          setIsSetTime = {setIsSetTime}
-          onPostSuccess={fetchData}
+            setIsSetTime={setIsSetTime} 
+            onPostSuccess={fetchData}
         />}
+
 
         {isModal && <Modal
           setIsModal={setIsModal}
           onPostSuccess={fetchData} // Truyền callback để fetch dữ liệu sau POST
         />}
-        <DeleteModal 
-          isDeleteModal={isDeleteModal} 
-          setIsDeleteModal={setIsDeleteModal} 
-          pondTypeName={selectedPondTypeName} // Truyền tên khối được chọn vào modal
-          onDeleteSuccess={fetchData} // Gọi lại khi xóa thành công
-        />
+        {isDeleteModal &&
+          <DeleteModal 
+             
+            setIsDeleteModal={setIsDeleteModal} 
+            pondTypeName={selectedPondTypeName} // Truyền tên khối được chọn vào modal
+            onDeleteSuccess={fetchData} // Gọi lại khi xóa thành công
+          />
 
-        <CreateModal 
-          isCreateModal = {isCreateModal}
+        }
+
+        {
+        isCreateModal && <CreateModal 
           setIsCreateModal = {setIsCreateModal}
           onPostSuccess = {fetchData}
           pondTypeName = {selectedPondTypeName}
         />
+        }
         
         {showImage && <ImageModal 
           setShowImage = {setShowImage}
@@ -167,9 +178,19 @@ function Dashboard() {
           >
           </FaMapMarkerAlt>
 
+
         </div>
 
       </div>
+          {isLoading && <Loading/>}
+          <ToastContainer 
+                        position="top-right" 
+                        autoClose={3000} 
+                        hideProgressBar={false} 
+                        newestOnTop={false} 
+                        closeOnClick 
+                        pauseOnHover 
+                    />
     </div>
   );
 }

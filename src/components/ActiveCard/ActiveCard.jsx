@@ -53,8 +53,6 @@ const handleFileChange = (e) => {
                 sizeShrimp: parseFloat(sizeShrimp),
                 amountShrimp: parseFloat(amountShrimp)
             };
-
-            console.log(data)
             
 
             setIsLoading(true);

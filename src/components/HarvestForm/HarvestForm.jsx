@@ -6,7 +6,7 @@ import { DashboardRequestApi, HarvestRequest } from '../../services/api';
 import InputField from '../InputField';
 import SelectField from '../SelectField';
 import { useLocation } from 'react-router-dom';
-
+import Loading from '../Loading'
 function HarvestForm() {
     const [pondId, setPondId] = useState('');
     const [harvestType, setHarvestType] = useState(0);
@@ -40,7 +40,6 @@ function HarvestForm() {
             (res) => {
                 setHarvestTime(res[0].harvestTime + 1);
             },
-            'Failed to get pond list and harvest time!'
         );
     }, [callApi, pondId]);
 
@@ -56,7 +55,6 @@ function HarvestForm() {
             (res) => {
                 setPonds(res[0]);
             },
-            'Failed to get pond list!'
         );
     }, [callApi]);
 
@@ -124,107 +122,110 @@ function HarvestForm() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl mx-auto h-[90%] mt-5">
-            <h1 className="text-xl font-bold mb-4">Thu hoạch</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <SelectField
-                        label="Chọn ao"
-                        id="pondId"
-                        value={pondId}
-                        onChange={handleInputChange(setPondId)}
-                        options={[
-                            { value: '', label: 'Chọn ao' },
-                            ...ponds.map((pond) => ({ value: pond.pondId, label: pond.pondId }))
-                        ]}
-                    />
-                    <InputField
-                        label="Lần thu hoạch"
-                        id="harvestTime"
-                        value={harvestTime}
-                        onChange={handleInputChange(setHarvestTime)}
-                        placeholder="Nhập lần thu hoạch"
-                    />
-                    <SelectField
-                        label="Loại thu hoạch"
-                        id="harvestType"
-                        value={harvestType}
-                        onChange={handleInputChange(setHarvestType)}
-                        options={[
-                            { value: 0, label: 'Thu tỉa' },
-                            { value: 1, label: 'Thu toàn bộ' }
-                        ]}
-                    />
-                    <div className="relative">
-                        <label htmlFor="harvestDate" className="block text-gray-700">
-                            Ngày thu hoạch:
-                        </label>
-                        <div className="flex items-center">
-                            <input
-                                type="date"
-                                id="harvestDate"
-                                ref={dateInputRef}
-                                value={harvestDate}
-                                onChange={handleInputChange(setHarvestDate)}
-                                className="block w-full pl-3 text-xl pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                            />
-                            <span
-                                className="absolute right-3 text-2xl text-gray-500 cursor-pointer"
-                                onClick={handleCalendarClick}
-                            >
-                                <IoCalendar />
-                            </span>
+        <>
+            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl mx-auto h-[90%] mt-5">
+                <h1 className="text-xl font-bold mb-4">Thu hoạch</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <SelectField
+                            label="Chọn ao"
+                            id="pondId"
+                            value={pondId}
+                            onChange={handleInputChange(setPondId)}
+                            options={[
+                                { value: '', label: 'Chọn ao' },
+                                ...ponds.map((pond) => ({ value: pond.pondId, label: pond.pondId }))
+                            ]}
+                        />
+                        <InputField
+                            label="Lần thu hoạch"
+                            id="harvestTime"
+                            value={harvestTime}
+                            onChange={handleInputChange(setHarvestTime)}
+                            placeholder="Nhập lần thu hoạch"
+                        />
+                        <SelectField
+                            label="Loại thu hoạch"
+                            id="harvestType"
+                            value={harvestType}
+                            onChange={handleInputChange(setHarvestType)}
+                            options={[
+                                { value: 0, label: 'Thu tỉa' },
+                                { value: 1, label: 'Thu toàn bộ' }
+                            ]}
+                        />
+                        <div className="relative">
+                            <label htmlFor="harvestDate" className="block text-gray-700">
+                                Ngày thu hoạch:
+                            </label>
+                            <div className="flex items-center">
+                                <input
+                                    type="date"
+                                    id="harvestDate"
+                                    ref={dateInputRef}
+                                    value={harvestDate}
+                                    onChange={handleInputChange(setHarvestDate)}
+                                    className="block w-full pl-3 text-xl pr-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                                />
+                                <span
+                                    className="absolute right-3 text-2xl text-gray-500 cursor-pointer"
+                                    onClick={handleCalendarClick}
+                                >
+                                    <IoCalendar />
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <InputField
-                        label="Size tôm (cm)"
-                        id="size"
-                        type="number"
-                        value={size}
-                        onChange={handleInputChange(setSize)}
-                        placeholder="Nhập kích cỡ tôm"
-                    />
-                    <InputField
-                        label="Sinh khối lúc thu hoạch"
-                        id="amount"
-                        type="number"
-                        value={amount}
-                        onChange={handleInputChange(setAmount)}
-                        placeholder="Nhập sinh khối thu hoạch"
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div className="relative">
-                        <label htmlFor="certificates" className="block text-gray-700">
-                            Giấy xét nghiệm kháng sinh:
-                        </label>
-                        <input
-                            type="file"
-                            id="certificates"
-                            onChange={handleFileChange}
-                            className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        <InputField
+                            label="Size tôm (cm)"
+                            id="size"
+                            type="number"
+                            value={size}
+                            onChange={handleInputChange(setSize)}
+                            placeholder="Nhập kích cỡ tôm"
+                        />
+                        <InputField
+                            label="Sinh khối lúc thu hoạch"
+                            id="amount"
+                            type="number"
+                            value={amount}
+                            onChange={handleInputChange(setAmount)}
+                            placeholder="Nhập sinh khối thu hoạch"
                         />
                     </div>
-                </div>
 
-                {errorMessage && (
-                    <p className="text-red-600 text-center mb-4">{errorMessage}</p>
-                )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div className="relative">
+                            <label htmlFor="certificates" className="block text-gray-700">
+                                Giấy xét nghiệm kháng sinh:
+                            </label>
+                            <input
+                                type="file"
+                                id="certificates"
+                                onChange={handleFileChange}
+                                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                            />
+                        </div>
+                    </div>
 
-                <div className="flex justify-center">
-                    <button
-                        type="submit"
-                        className={cl('bg-green-500 hover:bg-green-600 text-xl font-medium text-white py-2 px-6 rounded-md', {
-                            'opacity-50 cursor-not-allowed': isLoading
-                        })}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Đang xử lý...' : 'Xác nhận'}
-                    </button>
-                </div>
-            </form>
-        </div>
+                    {errorMessage && (
+                        <p className="text-red-600 text-center mb-4">{errorMessage}</p>
+                    )}
+
+                    <div className="flex justify-center">
+                        <button
+                            type="submit"
+                            className={cl('bg-green-500 hover:bg-green-600 text-xl font-medium text-white py-2 px-6 rounded-md', {
+                                'opacity-50 cursor-not-allowed': isLoading
+                            })}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Đang xử lý...' : 'Xác nhận'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {isLoading && <Loading/>}
+        </>
     );
 }
 
