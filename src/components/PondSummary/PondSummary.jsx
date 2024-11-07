@@ -97,7 +97,7 @@ const PondSummary = ({ ponds, pondTypeName, setIsDeleteModal, setIsCreateModal, 
           onMouseUp={() => setDragging(false)}
           onMouseLeave={() => setDragging(false)}
         >
-          <div className="flex gap-x-3 h-full">
+          <div className="flex gap-x-3 h-full last:mr-5">
           {ponds.map((res) => (
             <Card
               onPutSucces = {onPutSucces} 
