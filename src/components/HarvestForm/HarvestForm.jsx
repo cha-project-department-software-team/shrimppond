@@ -125,6 +125,7 @@ function HarvestForm() {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl mx-auto h-[90%] mt-5">
+            <h1 className="text-xl font-bold mb-4">Thu hoạch</h1>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <SelectField

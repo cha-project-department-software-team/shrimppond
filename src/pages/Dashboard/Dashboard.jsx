@@ -3,6 +3,8 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import PondSummary from '../../components/PondSummary/PondSummary';
 import Modal from '../../components/Modal';
 import DeleteModal from '../../components/DeleteModal';
+import SetTime from '../../components/SetTime';
+import { AiOutlineClockCircle } from 'react-icons/ai';
 import useCallApi from '../../hooks/useCallApi';
 import { useSelector } from 'react-redux';
 import { DashboardRequestApi } from '../../services/api';
@@ -20,6 +22,7 @@ function Dashboard() {
   const expanded = useSelector((state) => state.sidebar.expanded);
   const [isModal, setIsModal] = useState(false);
   const [isCreateModal, setIsCreateModal] = useState(false)
+  const [isSetTime, setIsSetTime] = useState(false)
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [showImage ,setShowImage] = useState(false)
   const [activePonds, setActivePonds] = useState(0)
@@ -102,12 +105,6 @@ function Dashboard() {
         </div>
         
 
-        <FaMapMarkerAlt 
-          onClick = {() => setShowImage(true)}
-          className = "fixed top-5 right-5 text-4xl text-red-500"
-        >
-        </FaMapMarkerAlt>
-
         <button className ="h-10 w-10 right-4 items-center rounded-2xl bottom-5 fixed bg-[#61CBF4]/[.90] flex justify-center">
           <CiCirclePlus
             onClick={() => { setIsModal(true); }}
@@ -131,6 +128,12 @@ function Dashboard() {
           <h1 className = "text-xl font-bold">Tạo khối</h1>
         </button> */}
 
+
+        {isSetTime && <SetTime 
+          setIsSetTime = {setIsSetTime}
+          onPostSuccess={fetchData}
+        />}
+
         {isModal && <Modal
           setIsModal={setIsModal}
           onPostSuccess={fetchData} // Truyền callback để fetch dữ liệu sau POST
@@ -152,6 +155,19 @@ function Dashboard() {
         {showImage && <ImageModal 
           setShowImage = {setShowImage}
         />}
+
+        <div className = "fixed top-5 right-5 text-4xl flex gap-x-2">
+          <AiOutlineClockCircle
+            onClick = {() => setIsSetTime(true)}
+            className = ""        
+          />
+          <FaMapMarkerAlt 
+            onClick = {() => setShowImage(true)}
+            className = " text-red-500"
+          >
+          </FaMapMarkerAlt>
+
+        </div>
 
       </div>
     </div>
