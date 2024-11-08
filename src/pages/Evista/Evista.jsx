@@ -241,7 +241,7 @@ function Evista() {
         <Sidebar />
       </aside>
       <div className="flex-grow p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-gray-700">Thông số môi trường</h1>
+        <h1 className="text-2xl font-bold text-black-700">Thông số môi trường</h1>
         <div className="space-y-4">
           <div className="flex space-x-4">
             <Select options={pondTypes} onChange={handlePondTypeChange} placeholder="Chọn loại ao" value={selectedPondType} />

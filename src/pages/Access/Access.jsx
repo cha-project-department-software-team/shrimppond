@@ -97,7 +97,7 @@ function Access() {
     <div className="flex bg-gray-100 min-h-screen">
       <Sidebar />
       <div className="flex flex-col w-full p-8 space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Truy xuất nguồn gốc</h1>
+        <h1 className="text-2xl font-bold text-black-700">Truy xuất nguồn gốc</h1>
 
         <div className="flex space-x-4 mb-6">
           <div className="w-1/3">
@@ -136,9 +136,9 @@ function Access() {
             </select>
           </div>
 
-          <div className="flex items-center w-1/3">
+          <div className="flex items-end w-1/3">
             <button
-              className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+              className="p-3 text-white bg-blue-500 rounded-md hover:bg-blue-600 w-10 h-10"
               onClick={fetchData}
               disabled={loading}
             >
