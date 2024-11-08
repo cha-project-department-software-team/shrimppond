@@ -226,7 +226,7 @@ function Evista() {
     setEndDate(today); // Set to today
   };
 
-  // Function to handle the "1 ngày nữa" button click
+  // Function to handle the "1 ngày" button click
   const handle1DayClick = () => {
     const today = new Date();
     const tomorrow = new Date(today);
@@ -265,7 +265,7 @@ function Evista() {
             <FaPlus className="inline-block mr-2" /> Thêm ao
           </button>
         </div>
-        <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-lg shadow-md overflow-y-auto" style={{ maxHeight: '460px' }}>
+        <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-lg shadow-md overflow-y-auto" style={{ height: '70%' }}>
           {renderCharts()}
         </div>
         <Modal
