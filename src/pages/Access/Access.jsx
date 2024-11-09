@@ -23,7 +23,7 @@ function Access() {
   useEffect(() => {
     const fetchLotOptions = async () => {
       try {
-        const response = await axios.get('http://shrimppond.runasp.net/api/Traceability/GetSeedId?pageSize=200&pageNumber=1');
+        const response = await axios.get('https://shrimppond.runasp.net/api/Traceability/GetSeedId?pageSize=200&pageNumber=1');
         setLotOptions(response.data.map(lot => ({ id: lot.seedId, label: lot.seedId })));
       } catch (error) {
         console.error('Error fetching lot options: ', error);

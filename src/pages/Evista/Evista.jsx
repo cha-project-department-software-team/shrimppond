@@ -58,7 +58,7 @@ function Evista() {
   }, [selectedPondType]);
 
   const fetchPondTypes = async () => {
-    const url = 'http://shrimppond.runasp.net/api/PondType?pageSize=200&pageNumber=1';
+    const url = 'https://shrimppond.runasp.net/api/PondType?pageSize=200&pageNumber=1';
     try {
       const response = await axios.get(url);
       setPondTypes(
