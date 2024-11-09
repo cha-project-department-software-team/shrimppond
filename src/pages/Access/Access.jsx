@@ -36,7 +36,7 @@ function Access() {
   useEffect(() => {
     const fetchHarvestTimes = async () => {
       try {
-        const response = await axios.get('http://shrimppond.runasp.net/api/Traceability/GetTimeHarvest?pageSize=200&pageNumber=1');
+        const response = await axios.get('https://shrimppond.runasp.net/api/Traceability/GetTimeHarvest?pageSize=200&pageNumber=1');
         setHarvestTimeOptions(response.data.map(time => ({ id: time.harvestTime, label: time.harvestTime })));
       } catch (error) {
         console.error('Error fetching harvest times: ', error);
@@ -53,7 +53,7 @@ function Access() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://shrimppond.runasp.net/api/Traceability?SeedId=${selectedLot}&HarvestTime=${selectedHarvestTime}&pageSize=200&pageNumber=1`
+        `https://shrimppond.runasp.net/api/Traceability?SeedId=${selectedLot}&HarvestTime=${selectedHarvestTime}&pageSize=200&pageNumber=1`
       );
       setData(response.data);
     } catch (error) {
