@@ -155,7 +155,8 @@ function Evista() {
   const renderCharts = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center space-x-2">
+          <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-solid rounded-full animate-spin border-t-blue-500"></div>
           <p className="text-lg text-gray-500">Loading data...</p>
         </div>
       );
@@ -206,7 +207,7 @@ function Evista() {
       </div>
     ));
   };
-
+  
   const closeModal = () => setIsModalOpen(false);
 
   // Function to handle the startDate change and update endDate automatically
