@@ -155,7 +155,8 @@ function Evista() {
   const renderCharts = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center space-x-2">
+          <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-solid rounded-full animate-spin border-t-blue-500"></div>
           <p className="text-lg text-gray-500">Loading data...</p>
         </div>
       );
@@ -206,7 +207,7 @@ function Evista() {
       </div>
     ));
   };
-
+  
   const closeModal = () => setIsModalOpen(false);
 
   // Function to handle the startDate change and update endDate automatically
@@ -226,7 +227,7 @@ function Evista() {
     setEndDate(today); // Set to today
   };
 
-  // Function to handle the "1 ngày nữa" button click
+  // Function to handle the "1 ngày" button click
   const handle1DayClick = () => {
     const today = new Date();
     const tomorrow = new Date(today);
@@ -241,7 +242,7 @@ function Evista() {
         <Sidebar />
       </aside>
       <div className="flex-grow p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-gray-700">Thông số môi trường</h1>
+        <h1 className="text-2xl font-bold text-black-700">Thông số môi trường</h1>
         <div className="space-y-4">
           <div className="flex space-x-4">
             <Select options={pondTypes} onChange={handlePondTypeChange} placeholder="Chọn loại ao" value={selectedPondType} />
@@ -265,7 +266,7 @@ function Evista() {
             <FaPlus className="inline-block mr-2" /> Thêm ao
           </button>
         </div>
-        <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-lg shadow-md overflow-y-auto" style={{ maxHeight: '460px' }}>
+        <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-lg shadow-md overflow-y-auto" style={{ height: '70%' }}>
           {renderCharts()}
         </div>
         <Modal

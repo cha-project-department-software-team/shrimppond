@@ -97,7 +97,7 @@ function Access() {
     <div className="flex bg-gray-100 min-h-screen">
       <Sidebar />
       <div className="flex flex-col w-full p-8 space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Truy xuất nguồn gốc</h1>
+        <h1 className="text-2xl font-bold text-black-700">Truy xuất nguồn gốc</h1>
 
         <div className="flex space-x-4 mb-6">
           <div className="w-1/3">
@@ -136,9 +136,9 @@ function Access() {
             </select>
           </div>
 
-          <div className="flex items-center w-1/3">
+          <div className="flex items-end w-1/3">
             <button
-              className="p-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+              className="p-3 text-white bg-blue-500 rounded-md hover:bg-blue-600 w-10 h-10"
               onClick={fetchData}
               disabled={loading}
             >
@@ -148,7 +148,11 @@ function Access() {
         </div>
 
         {loading ? (
-          <p>Loading data...</p>
+          // Spinner loading effect here
+          <div className="flex justify-center items-center space-x-2">
+            <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-solid rounded-full animate-spin border-t-blue-500"></div>
+            <p className="text-lg text-gray-500">Loading data...</p>
+          </div>
         ) : data ? (
           <table className="min-w-full divide-y divide-gray-200 bg-white shadow-md rounded-lg">
             <thead className="bg-gray-50">
