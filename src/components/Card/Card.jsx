@@ -72,7 +72,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col transition-all rounded-xl max-w-48 relative">
+      <div className="flex-1 flex flex-col transition-all rounded-xl max-w-48 relative w-[170px]">
         <div className={cl("flex justify-between w-full rounded-t-lg border border-black", {
           "bg-[#00A9EA]": status,
           "bg-gray-400" : !status
@@ -85,11 +85,11 @@ useEffect(() => {
           </div>
         </div>
 
-        {status ? (
+        {/* {status ? (
           <div className="flex flex-col w-full py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black">
             <div className="flex gap-x-1">
               {actions.map((action) => (
-                <div key={action.id} className={`w-9 h-8 ${action.bgColor} rounded-xl flex items-center justify-center`}>
+                <div key={action.id} className={`w-8 h-7 ${action.bgColor} rounded-xl flex items-center justify-center`}>
                   {action.icon}
                 </div>
               ))}
@@ -113,7 +113,7 @@ useEffect(() => {
           <div className="absolute bottom-0 left-0 flex flex-nowrap gap-x-1 bg-white p-1 rounded-lg z-0 border border-black max-w-48">
             {extraActions.map((extraAction) => (
               <div key={extraAction.id} 
-                className={`w-8 h-8 ${extraAction.bgColor} rounded-xl flex items-center justify-center cursor-pointer`}
+                className={`w-7 h-7 ${extraAction.bgColor} rounded-xl flex items-center justify-center cursor-pointer`}
                 onClick={() => {
                   if (extraAction.id === 5) setIsDeleteCard(true);
                   if (extraAction.id === 1) handleHarvestClick(pondId);
@@ -123,7 +123,62 @@ useEffect(() => {
               </div>
             ))}
           </div>
+        )} */}
+
+
+
+        {status ? (
+          <div className="flex flex-col w-full py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black">
+            <div className="flex gap-x-1">
+              {extraActions.map((extraAction) => (
+                <div key={extraAction.id} className={`w-8 h-7 ${extraAction.bgColor} rounded-xl flex items-center justify-center`}
+                onClick={() => {
+                  if (extraAction.id === 5) setIsDeleteCard(true);
+                  if (extraAction.id === 1) handleHarvestClick(pondId);
+                }}
+                >
+                  {extraAction.icon}
+                </div>
+              ))}
+              {/* <div className="flex items-center justify-center">
+                <FaEllipsisV onClick={() => setExtra((prev) => !prev)} className="text-black text-xl cursor-pointer" />
+              </div> */}
+            </div>
+          </div>
+        ) : (
+          <div className="flex py-1 gap-x-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black items-center">
+            <button 
+              className="bg-green-400 hover:bg-green-500 rounded-xl mt-1 w-20 font-semibold h-6 flex-1"
+              onClick={() => setIsActiveModal(true)} // Sửa đổi callback
+            >
+              Kích hoạt
+            </button>
+            {extraActions.find((action) => action.id === 5) && (
+              <div
+                className={`w-8 h-7 bg-gray-600 rounded-xl flex items-center justify-center cursor-pointer`}
+                onClick={() => setIsDeleteCard(true)} // Xử lý khi nhấn vào action này
+              >
+                {extraActions.find((action) => action.id === 5).icon}
+              </div>
+            )}
+          </div>
         )}
+
+        {/* {extra && (
+          <div className="absolute bottom-0 left-0 flex flex-nowrap gap-x-1 bg-white p-1 rounded-lg z-0 border border-black max-w-48">
+            {extraActions.map((extraAction) => (
+              <div key={extraAction.id} 
+                className={`w-7 h-7 ${extraAction.bgColor} rounded-xl flex items-center justify-center cursor-pointer`}
+                onClick={() => {
+                  if (extraAction.id === 5) setIsDeleteCard(true);
+                  if (extraAction.id === 1) handleHarvestClick(pondId);
+                }}
+              >
+                {extraAction.icon}
+              </div>
+            ))}
+          </div>
+        )} */}
 
         {isDeleteCard && (
           <DeleteCard 

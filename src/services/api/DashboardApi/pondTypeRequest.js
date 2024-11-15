@@ -20,6 +20,9 @@ const DashboardRequestApi = {
     },
     timeRequest: {
         setTimeRequest: async (data) => await axiosClient.post("/TimeSetting", data),
+    },
+    setTimeRequest: {
+        historySetTime: async () => await axiosClient.get("/TimeSetting")
     }
 
 }

@@ -121,6 +121,19 @@ function HarvestForm() {
         dateInputRef.current.focus();
     };
 
+    const handleInputChangeWithValidation = (setter) => (e) => {
+        const value = e.target.value;
+
+        // Chỉ cho phép số thực (có dấu . hoặc , hoặc số âm)
+        const regex = /^-?\d*(\.\d*)?$/;
+        if (regex.test(value) || value === '') {
+            setter(value); // Cập nhật giá trị nếu hợp lệ
+            setErrorMessage(''); // Xóa thông báo lỗi
+        } else {
+            setErrorMessage('Chỉ được nhập số thực!');
+        }
+    };
+
     return (
         <>
             <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl mx-auto h-[90%] mt-5">
@@ -141,8 +154,9 @@ function HarvestForm() {
                             label="Lần thu hoạch"
                             id="harvestTime"
                             value={harvestTime}
-                            onChange={handleInputChange(setHarvestTime)}
+                            onChange={() => {}}
                             placeholder="Nhập lần thu hoạch"
+                            readOnly
                         />
                         <SelectField
                             label="Loại thu hoạch"
@@ -178,17 +192,17 @@ function HarvestForm() {
                         <InputField
                             label="Size tôm (cm)"
                             id="size"
-                            type="number"
+                            type="text"
                             value={size}
-                            onChange={handleInputChange(setSize)}
+                            onChange={handleInputChangeWithValidation(setSize)}
                             placeholder="Nhập kích cỡ tôm"
                         />
                         <InputField
                             label="Sinh khối lúc thu hoạch"
                             id="amount"
-                            type="number"
+                            type="text"
                             value={amount}
-                            onChange={handleInputChange(setAmount)}
+                            onChange={handleInputChangeWithValidation(setAmount)}
                             placeholder="Nhập sinh khối thu hoạch"
                         />
                     </div>
