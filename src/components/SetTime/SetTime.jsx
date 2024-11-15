@@ -39,11 +39,11 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
         const newTimeFields = [...timeFields];
         newTimeFields[index][field] = value;
         setTimeFields(newTimeFields);
-        setDropdownVisible({}); // Đóng dropdown khi chọn giá trị
+        setDropdownVisible({});
     };
 
     const hourOptions = Array.from({ length: 25 }, (_, i) => i.toString());
-    const minuteOptions = Array.from({ length: 60 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+    const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
 
     const handleSubmit = (e) => {
         e.preventDefault();
