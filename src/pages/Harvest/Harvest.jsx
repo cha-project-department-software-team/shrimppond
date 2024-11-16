@@ -14,7 +14,7 @@ function Harvest() {
     const [isLoading, setIsLoading] = useState(false);
 
     return (
-        <div className="container flex h-screen overflow-hidden ">
+        <div className="flex h-screen overflow-hidden ">
             <aside className="h-full">
                 <Sidebar />
             </aside>
