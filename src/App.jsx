@@ -1,44 +1,39 @@
-import { Routes, Route, Navigate} from 'react-router-dom'
-import { Fragment } from 'react'
-import routes from './routes'
+import React, { Fragment } from 'react'; // Import Fragment từ React
+import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import routes from './routes';
+import useSignalR from './hooks/useSignalR'; // Import hook SignalR
 
 function App() {
+    useSignalR(); // Kích hoạt SignalR toàn cục
 
-  return (
-    <Routes>
-            {routes.map((route) => {
-                const Component = route.component
-                // const MainComponentLayout = route.mainLayout ? mainLayout : null
-                // const AddComponentLayout = route.addLayout ? addLayout : null
-                // const protectedRoute = route.protected
+    return (
+        <>
+            {/* Cấu hình ToastContainer để hiển thị thông báo */}
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                pauseOnHover
+            />
 
-                return (
-                    <Fragment key={route.path}>
-                        {/* {protectedRoute && !isLogin ? (
-                            <Route path="*" element={<Navigate to={paths.login} />} />
-                        ) : ( */}
-                        <Route
-                            path={route.path}
-                            element={
-                                // MainComponentLayout ? (
-                                //     <MainComponentLayout title={route.title}>
-                                //         <Component />
-                                //     </MainComponentLayout>
-                                // ) : AddComponentLayout ? (
-                                //     <AddComponentLayout title={route.title}>
-                                //         <Component />
-                                //     </AddComponentLayout>
-                                // ) : (
-                                    <Component />
-                                // )
-                            }
-                        />
-                        {/* )} */}
-                    </Fragment>
-                )
-            })}
-        </Routes>
-  )
+            {/* Định tuyến cho ứng dụng */}
+            <Routes>
+                {routes.map((route) => {
+                    const Component = route.component;
+
+                    return (
+                        <Fragment key={route.path}>
+                            <Route path={route.path} element={<Component />} />
+                        </Fragment>
+                    );
+                })}
+            </Routes>
+        </>
+    );
 }
 
-export default App
+export default App;
