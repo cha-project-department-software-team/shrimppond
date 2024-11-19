@@ -26,7 +26,7 @@ function Evista() {
       xaxis: { type: 'datetime', labels: { rotate: -45, rotateAlways: true } },
       yaxis: { title: { text: '' } },
       colors: ['#FF4560', '#00E396'],
-      stroke: { curve: 'smooth' },
+      stroke: { curve: 'straight' },
       annotations: { yaxis: [] },
     },
   });
@@ -178,6 +178,20 @@ function Evista() {
               x: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               y: parseFloat(d.value),
             }));
+
+            let yAxisTitle = '';
+            let yAxisStyle = {};
+            if (param === 'O2') {
+              yAxisTitle = 'mg/L';
+            } else if (param === 'Temperature') {
+              yAxisTitle = '℃';
+              // Make "℃" bold and larger
+              yAxisStyle = {
+                fontWeight: 'bold', 
+                fontSize: '18px', // Increase font size for "℃"
+              };
+            }
+
             return (
               <div key={param} className="parameter-chart w-1/3">
                 <h3
@@ -195,6 +209,12 @@ function Evista() {
                     ...chartData.options,
                     xaxis: { categories: data.map((d) => d.x) },
                     annotations: getAnnotations(param),
+                    yaxis: {
+                      title: {
+                        text: yAxisTitle,
+                        style: yAxisStyle, // Apply custom styles for "℃"
+                      },
+                    },
                   }}
                   series={[{ name: param, data: data.map((d) => d.y) }]}
                   type="line"
@@ -207,7 +227,7 @@ function Evista() {
       </div>
     ));
   };
-  
+
   const closeModal = () => setIsModalOpen(false);
 
   // Function to handle the startDate change and update endDate automatically
@@ -279,7 +299,17 @@ function Evista() {
           </div>
           <h2 className="text-lg font-bold">{activePondName} - {activeChart?.param}</h2>
           <Chart
-            options={{ ...chartData.options, xaxis: { categories: activeChart?.data.map((d) => d.x) }, annotations: getAnnotations(activeChart?.param) }}
+            options={{
+              ...chartData.options,
+              xaxis: { categories: activeChart?.data.map((d) => d.x) },
+              annotations: getAnnotations(activeChart?.param),
+              yaxis: {
+                title: {
+                  text: activeChart?.param === 'Temperature' ? '℃' : activeChart?.param === 'O2' ? 'mg/L' : '',
+                  style: (activeChart?.param === 'Temperature' || activeChart?.param === 'O2') ? { fontWeight: 'bold', fontSize: '18px' } : {}
+                },
+              },
+            }}
             series={[{ name: activeChart?.param, data: activeChart?.data.map((d) => d.y) }]}
             type="line"
             height={400}
