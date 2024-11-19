@@ -90,7 +90,7 @@ function StatusPage() {
 
     // Hàm xử lý khi click vào một trang trại
     const handleFarmClick = () => {
-        navigate('/dashboard'); // Chuyển hướng đến trang dashboard
+        navigate('/'); // Chuyển hướng đến trang dashboard
     };
 
     return (
