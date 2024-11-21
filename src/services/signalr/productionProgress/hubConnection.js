@@ -2,7 +2,7 @@ import { HubConnectionBuilder, HttpTransportType } from '@microsoft/signalr'
 // import { authStorageService } from '@/services/browserStorage'
 
 const connection = new HubConnectionBuilder() //Lớp tạo một kết nối tới một SignalR Hub
-    .withUrl(import.meta.env.VITE_SERVER_ADDRESS+ '/notificationHub', {
+    .withUrl('https://shrimppond.runasp.net/notificationHub', {
         transport: HttpTransportType.WebSockets,
         skipNegotiation: true,
         // accessTokenFactory: authStorageService.accessToken.get,
