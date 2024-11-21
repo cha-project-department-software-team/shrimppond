@@ -8,6 +8,8 @@ import Chart from 'react-apexcharts';
 import Modal from 'react-modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ToastContainer, toast } from "react-toastify"; // Import thêm toast
+import 'react-toastify/dist/ReactToastify.css';
 
 function Evista() {
   const navigate = useNavigate();
@@ -316,6 +318,15 @@ function Evista() {
           />
         </Modal>
       </div>
+
+      <ToastContainer 
+                        position="top-right" 
+                        autoClose={3000} 
+                        hideProgressBar={false} 
+                        newestOnTop={false} 
+                        closeOnClick 
+                        pauseOnHover 
+                    />
     </div>
   );
 }

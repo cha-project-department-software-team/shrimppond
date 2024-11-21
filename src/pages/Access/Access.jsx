@@ -5,6 +5,8 @@ import axios from 'axios';
 import { QRCodeCanvas } from 'qrcode.react';
 import { FaSearch } from 'react-icons/fa';
 import jsPDF from 'jspdf';
+import { ToastContainer, toast } from "react-toastify"; // Import thêm toast
+import 'react-toastify/dist/ReactToastify.css';
 
 function Access() {
   const navigate = useNavigate();
@@ -212,6 +214,15 @@ function Access() {
           )}
         </div>
       </div>
+
+      <ToastContainer 
+                        position="top-right" 
+                        autoClose={3000} 
+                        hideProgressBar={false} 
+                        newestOnTop={false} 
+                        closeOnClick 
+                        pauseOnHover 
+                    />
     </div>
   );
 }

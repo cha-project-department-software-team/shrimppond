@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'; // Import Fragment từ React
 import { Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import routes from './routes';
 import useSignalR from './hooks/useSignalR'; // Import hook SignalR
@@ -13,7 +13,7 @@ function App() {
             {/* Cấu hình ToastContainer để hiển thị thông báo */}
             <ToastContainer
                 position="top-right"
-                autoClose={5000}
+                autoClose={3000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
