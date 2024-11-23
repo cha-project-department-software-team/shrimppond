@@ -49,7 +49,7 @@ function Access() {
 
   const fetchData = async () => {
     if (!selectedLot || !selectedHarvestTime) {
-      alert('Please select both a lot and a harvest time.');
+      toast.warning('Vui lòng chọn cả lô và lần thu hoạch!');
       return;
     }
     setLoading(true);
@@ -57,13 +57,22 @@ function Access() {
       const response = await axios.get(
         `https://shrimppond.runasp.net/api/Traceability?SeedId=${selectedLot}&HarvestTime=${selectedHarvestTime}&pageSize=200&pageNumber=1`
       );
-      setData(response.data);
+  
+      if (!response.data || Object.keys(response.data).length === 0) {
+        toast.warning('Không có lần thu hoạch.');
+        setData(null);
+      } else {
+        setData(response.data);
+      }
     } catch (error) {
       console.error('Error fetching data: ', error);
+      toast.error('Không có lần thu hoạch nào.');
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   const generateQRCodeData = () => {
     if (!data) return '';

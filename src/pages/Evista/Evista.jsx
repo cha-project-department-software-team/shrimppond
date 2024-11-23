@@ -94,15 +94,20 @@ function Evista() {
       const phData = await fetchData('Ph', pond);
       const o2Data = await fetchData('O2', pond);
       const tempData = await fetchData('Temperature', pond);
-
+  
+      // Ghi đè dữ liệu mới cho ao
       setPondData((prevData) => ({
         ...prevData,
         [pond]: { Ph: phData, O2: o2Data, Temperature: tempData },
       }));
+      toast.success(`Dữ liệu ao ${pond} đã được cập nhật!`);
+    } catch (error) {
+      toast.error(`Không thể tải dữ liệu cho ao ${pond}.`);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const fetchData = async (parameter, pond) => {
     const formattedStartDate = formatDate(startDate);
@@ -127,11 +132,22 @@ function Evista() {
   const handlePondChange = (selectedOption) => setSelectedPond(selectedOption.value);
 
   const addPond = () => {
-    if (selectedPond && !selectedPonds.includes(selectedPond)) {
-      setSelectedPonds([...selectedPonds, selectedPond]);
-      fetchAllParameters(selectedPond);
+    if (!selectedPond) {
+      toast.warning("Vui lòng chọn một ao!");
+      return;
     }
-  };
+  
+    // Kiểm tra nếu ao đã tồn tại trong selectedPonds
+    const pondExists = selectedPonds.includes(selectedPond);
+  
+    if (!pondExists) {
+      // Thêm ao mới vào danh sách
+      setSelectedPonds([...selectedPonds, selectedPond]);
+    }
+  
+    // Dù ao đã tồn tại hay chưa, gọi API để cập nhật dữ liệu
+    fetchAllParameters(selectedPond);
+  };  
 
   const deletePond = (pond) => {
     setSelectedPonds(selectedPonds.filter((p) => p !== pond));
