@@ -21,8 +21,7 @@ function Harvest() {
             <div className="grow pt-5">
                 
                 <main className="scroll-y h-[calc(100vh-50px)] p-5">
-                   <HarvestForm 
-                    
+                   <HarvestForm   
                    />
                 </main>
             </div>
