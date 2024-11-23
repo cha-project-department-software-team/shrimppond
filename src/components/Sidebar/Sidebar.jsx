@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
@@ -24,6 +24,19 @@ function Sidebar() {
   const dispatch = useDispatch();
 
   const [active, setActive] = React.useState("Dashboard");
+  const [showDelayed, setShowDelayed] = React.useState(false);
+
+useEffect(() => {
+  if (expanded) {
+    const timeout = setTimeout(() => {
+      setShowDelayed(true);
+    }, 150);
+    return () => clearTimeout(timeout); 
+  } else {
+    setShowDelayed(false);
+  }
+}, [expanded]);
+
 
   useLayoutEffect(() => {
     if (location.pathname === "/") {
@@ -87,12 +100,27 @@ function Sidebar() {
               <div className="flex items-center justify-center text-black font-bold">
                 <span className="mr-4 text-2xl items-center justify-center pl-[5px]">{item.icon}</span>
                 {expanded 
-                  ? <span className={`transition-all duration-300 whitespace-nowrap`}>{item.name}</span> 
-                  : <div className={`absolute left-full rounded-md px-2 py-1 ml-6 whitespace-nowrap bg-indigo-100 text-indigo-800 invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 group-hover:z-50`}>{item.name}</div>}
-              </div>
-            </li>
-          ))}
-        </ul>
+                  ? (
+                      <span
+                        className={`transition-all duration-300 whitespace-nowrap ${
+                          showDelayed ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        {item.name}
+                      </span>
+                    )
+                  : (
+                      <div
+                        className={`absolute left-full rounded-md px-2 py-1 ml-6 whitespace-nowrap bg-indigo-100 text-indigo-800 invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 group-hover:z-50`}
+                      >
+                        {item.name}
+                      </div>
+                    )}
+
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
 
         {/* Nút Logout */}
         <div className="border-t p-3 flex justify-between items-center">
