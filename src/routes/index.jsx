@@ -43,6 +43,11 @@ const routes = [
         component: Pages.Access, //dữ liệu
 
     },
+    {
+        path: paths.login, //đường link
+        component: Pages.Login, //dữ liệu
+
+    },
 ]
 
 export default routes

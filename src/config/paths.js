@@ -9,6 +9,7 @@ const paths ={
     access: "/access",//
     harvest: "/harvest",//
     move: "/move",//
+    login: "/login",
 }
 
 export default paths

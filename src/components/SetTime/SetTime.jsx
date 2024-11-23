@@ -85,7 +85,6 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
             };
             setIsLoading(true);
 
-            // Bắt đầu call API của bạn
             callApi(
                 () => DashboardRequestApi.timeRequest.setTimeRequest(data),
                 (res) => {
@@ -110,24 +109,18 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                !event.target.classList.contains('overflow-y-auto') &&
-                !dropdownRefs.current.some(ref => ref && ref.contains(event.target))
-            ) {
-                setDropdownVisible({});
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    const handleCloseDropdown = () =>{
+        setDropdownVisible({});
+    } 
+
+    const handlePrevent = (event) => {
+        event.stopPropagation();
+    }
 
     return (
         <div 
             className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50")}
+            onClick = {handleCloseDropdown}
         >
             <div className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">
                 <i 
@@ -144,7 +137,9 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                             <h2 className='font-semibold'>Thiết lập lần đo {index + 1}</h2>
                             
                             {/* Hour Dropdown */}
-                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], hour: el })}>
+                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], hour: el })}
+                                onClick = {handlePrevent}    
+                            >
                                 <input 
                                     type="text"
                                     placeholder="Chọn giờ"
@@ -169,7 +164,9 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                             </div>
                             
                             {/* Minute Dropdown */}
-                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], minute: el })}>
+                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], minute: el })}
+                                onClick = {handlePrevent}    
+                            >
                                 <input 
                                     type="text"
                                     placeholder="Chọn phút"
