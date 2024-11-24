@@ -1,18 +1,20 @@
-import React from 'react';
+// import React from 'react';
 
-function LogoutButton({ setIsLogin }) {
-  const handleLogout = () => {
-    setIsLogin(false); // Đặt trạng thái đăng xuất
-  };
+// function LogoutButton({ setIsLogin }) {
+//   const handleLogout = () => {
+//     setIsLogin(false); // Đặt trạng thái đăng xuất
+//   };
 
-  return (
-    <button
-      onClick={handleLogout}
-      className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-    >
-      Đăng xuất
-    </button>
-  );
-}
+//   return (
+//     <button
+//       onClick={handleLogout}
+//       className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+//     >
+//       Đăng xuất
+//     </button>
+//   );
+// }
 
-export default LogoutButton;
+// export default LogoutButton;
+
+//đã tích hợp vào trong sidebar, không cần xài ở đây!!!!

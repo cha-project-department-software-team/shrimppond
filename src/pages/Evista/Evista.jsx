@@ -10,6 +10,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ToastContainer, toast } from "react-toastify"; // Import thêm toast
 import 'react-toastify/dist/ReactToastify.css';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 function Evista() {
   const navigate = useNavigate();
@@ -283,27 +284,46 @@ function Evista() {
         <h1 className="text-2xl font-bold text-black-700">Thông số môi trường</h1>
         <div className="space-y-4">
           <div className="flex space-x-4">
-            <Select options={pondTypes} onChange={handlePondTypeChange} placeholder="Chọn loại ao" value={selectedPondType} />
-            <Select options={pondOptions} onChange={handlePondChange} placeholder="Chọn ao" value={pondOptions.find((option) => option.value === selectedPond)} />
-            <DatePicker selected={startDate} onChange={handleStartDateChange} dateFormat="yyyy-MM-dd" className="px-4 py-2 border rounded" />
-            <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} dateFormat="yyyy-MM-dd" className="px-4 py-2 border rounded" />
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Chọn loại ao</label>
+              <Select options={pondTypes} onChange={handlePondTypeChange} placeholder="Chọn loại ao" value={selectedPondType} />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Chọn ao</label>
+              <Select options={pondOptions} onChange={handlePondChange} placeholder="Chọn ao" value={pondOptions.find((option) => option.value === selectedPond)} />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Ngày bắt đầu</label>
+              <DatePicker selected={startDate} onChange={handleStartDateChange} dateFormat="yyyy-MM-dd" className="px-4 py-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Ngày kết thúc</label>
+              <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} dateFormat="yyyy-MM-dd" className="px-4 py-2 border rounded" />
+            </div>
+          </div>
+          <div className="flex space-x-4 items-center">
             <button
+              data-tooltip-id="one-day-tooltip"
               onClick={handle1DayClick}
               className="px-4 py-2 text-white bg-orange-500 hover:bg-orange-600 rounded"
             >
               1 ngày
             </button>
             <button
+              data-tooltip-id="seven-day-tooltip"
               onClick={handle7DaysClick}
               className="px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded"
             >
               7 ngày
             </button>
+            <button onClick={addPond} className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">
+              <FaPlus className="inline-block mr-2" /> Thêm ao
+            </button>
           </div>
-          <button onClick={addPond} className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">
-            <FaPlus className="inline-block mr-2" /> Thêm ao
-          </button>
+          <ReactTooltip id="one-day-tooltip" content="Dữ liệu hôm nay" />
+          <ReactTooltip id="seven-day-tooltip" content="Dữ liệu của 7 ngày trước (không tính hôm nay)" />
         </div>
+        
         <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-lg shadow-md overflow-y-auto" style={{ height: '70%' }}>
           {renderCharts()}
         </div>
