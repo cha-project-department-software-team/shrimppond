@@ -187,17 +187,77 @@ function Access() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.totalAmount}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.size}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {data.certificates.map((base64, index) => (
+                {data.certificates.map((base64, index) => {
+                  // Hàm tự động nhận diện loại file từ base64
+                  const detectFileType = (base64) => {
+                    // Kiểm tra nếu base64 không hợp lệ
+                    if (!base64) {
+                      return 'pdf';  // Mặc định trả về PDF nếu không có base64
+                    }
+                  
+                    // Loại bỏ phần base64 header (bỏ qua "data:{mime};base64,")
+                    const base64Data = base64.split(',')[1] || base64;
+                  
+                    // Kiểm tra dữ liệu base64 có hợp lệ không
+                    if (!base64Data) {
+                      return 'pdf';  // Trả về 'pdf' nếu không có base64Data
+                    }
+                  
+                    // Các magic bytes đặc trưng của một số loại tệp phổ biến
+                    if (base64Data.startsWith('JVBER')) {
+                      return 'pdf';  // PDF
+                    } else if (base64Data.startsWith('iVBOR')) {
+                      return 'png';  // PNG
+                    } else if (base64Data.startsWith('/9j/')) {
+                      return 'jpeg';  // JPEG/JPG
+                    } else if (base64Data.startsWith('R0lG')) {
+                      return 'gif';  // GIF
+                    } else if (base64Data.startsWith('SUQz')) {
+                      return 'mp3';  // MP3
+                    } else if (base64Data.startsWith('UEsDB')) {
+                      return 'docx';  // DOCX (ZIP)
+                    } else if (base64Data.startsWith('TVqQA')) {
+                      return 'xlsx';
+                    } else if (base64Data.startsWith('0x504B0304')) {
+                      return 'zip';  // ZIP (có thể chứa bất kỳ loại file nào)
+                    }
+                    
+                    // Nếu không nhận diện được, trả về mặc định là pdf
+                    return 'pdf';
+                  };
+                
+                  // Xác định loại tệp từ base64
+                  const fileType = detectFileType(base64);
+                
+                  // Các MIME types tương ứng với các loại file
+                  const mimeTypes = {
+                    pdf: "application/pdf",
+                    png: "image/png",
+                    jpeg: "image/jpeg",
+                    jpg: "image/jpeg",
+                    gif: "image/gif",
+                    mp3: "audio/mpeg",
+                    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    zip: "application/zip",  // MIME type cho file ZIP
+                    // Thêm các loại file khác nếu cần
+                  };
+                
+                  // Lấy MIME type tương ứng
+                  const mimeType = mimeTypes[fileType] || "application/pdf";
+                
+                  return (
                     <div key={index} className="mb-1">
                       <a
-                        href={`data:application/pdf;base64,${base64}`}
-                        download={`Certificate_${index + 1}.pdf`}
+                        href={`data:${mimeType};base64,${base64}`}
+                        download={`Certificate_${index + 1}.${fileType}`}
                         className="text-blue-500 underline"
                       >
                         Download Certificate {index + 1}
                       </a>
                     </div>
-                  ))}
+                  );
+                })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.daysOfRearing}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.farmName}</td>
