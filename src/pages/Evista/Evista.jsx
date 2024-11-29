@@ -192,56 +192,58 @@ function Evista() {
           </button>
         </div>
         <div className="flex space-x-4">
-          {Object.keys(pondData[pond] || {}).map((param) => {
-            const data = pondData[pond][param].map((d) => ({
-              x: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              y: parseFloat(d.value),
-            }));
-
-            let yAxisTitle = '';
-            let yAxisStyle = {};
-            if (param === 'O2') {
-              yAxisTitle = 'mg/L';
-            } else if (param === 'Temperature') {
-              yAxisTitle = '℃';
-              // Make "℃" bold and larger
-              yAxisStyle = {
-                fontWeight: 'bold', 
-                fontSize: '18px', // Increase font size for "℃"
-              };
-            }
-
-            return (
-              <div key={param} className="parameter-chart w-1/3">
-                <h3
-                  className="text-center font-bold cursor-pointer"
-                  onClick={() => {
-                    setActiveChart({ param, data });
-                    setActivePondName(pond);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  {param}
-                </h3>
-                <Chart
-                  options={{
-                    ...chartData.options,
-                    xaxis: { categories: data.map((d) => d.x) },
-                    annotations: getAnnotations(param),
-                    yaxis: {
-                      title: {
-                        text: yAxisTitle,
-                        style: yAxisStyle, // Apply custom styles for "℃"
-                      },
+        {Object.keys(pondData[pond] || {}).map((param) => {
+          const data = pondData[pond][param].map((d) => ({
+            x: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            y: parseFloat(d.value),
+          }));
+        
+          let yAxisTitle = '';
+          let yAxisStyle = {};
+          if (param === 'O2') {
+            yAxisTitle = 'mg/L';
+          } else if (param === 'Temperature') {
+            yAxisTitle = '℃';
+            yAxisStyle = {
+              fontWeight: 'bold', 
+              fontSize: '18px',
+            };
+          }
+        
+          // Định dạng lại tên tham số
+          const formattedParam = param === 'Ph' ? 'pH' : param;
+        
+          return (
+            <div key={param} className="parameter-chart w-1/3">
+              <h3
+                className="text-center font-bold cursor-pointer"
+                onClick={() => {
+                  setActiveChart({ param, data });
+                  setActivePondName(pond);
+                  setIsModalOpen(true);
+                }}
+              >
+                {formattedParam}
+              </h3>
+              <Chart
+                options={{
+                  ...chartData.options,
+                  xaxis: { categories: data.map((d) => d.x) },
+                  annotations: getAnnotations(param),
+                  yaxis: {
+                    title: {
+                      text: yAxisTitle,
+                      style: yAxisStyle,
                     },
-                  }}
-                  series={[{ name: param, data: data.map((d) => d.y) }]}
-                  type="line"
-                  height={200}
-                />
-              </div>
-            );
-          })}
+                  },
+                }}
+                series={[{ name: formattedParam, data: data.map((d) => d.y) }]}
+                type="line"
+                height={200}
+              />
+            </div>
+          );
+        })}
         </div>
       </div>
     ));
