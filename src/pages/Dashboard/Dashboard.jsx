@@ -35,7 +35,7 @@ function Dashboard() {
   const [selectedPondTypeName, setSelectedPondTypeName] = useState(''); // State để lưu tên khối được chọn để xóa
 
 
-  const handleLoading = () => {setIsLoading(false)}
+  // const handleLoading = () => {setIsLoading(false)}
   
   // Hàm lấy dữ liệu PondType từ API
   const fetchData = useCallback(() => {
@@ -44,7 +44,6 @@ function Dashboard() {
         DashboardRequestApi.pondTypeRequest.getPondTypeRequest(),
         DashboardRequestApi.pondRequest.getPondRequest(),
         DashboardRequestApi.pondRequest.getPondRequestByStatus(1),
-        handleLoading()
       ], 
       (res) => {
         setPondTypes(res[0]); // Lưu dữ liệu vào state pondTypes
@@ -54,6 +53,15 @@ function Dashboard() {
       },
     );
   }, [callApi]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 200); 
+  
+    return () => clearTimeout(timer); 
+  }, []);
+  
 
   // Gọi hàm fetchData khi component được mount
   useEffect(() => {

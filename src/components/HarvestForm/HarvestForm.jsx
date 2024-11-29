@@ -96,8 +96,6 @@ function HarvestForm() {
             pondId: pondId.trim(),
         };
 
-        console.log(data)
-
         setIsLoading(true);
         callApi(
             () => HarvestRequest.HarvestRequestApi.postHarvest(data),

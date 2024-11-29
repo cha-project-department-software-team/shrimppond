@@ -131,7 +131,7 @@ useEffect(() => {
           <div className="flex flex-col w-full py-1 px-1 bg-white rounded-b-lg overflow-hidden transition-all duration-300 border border-black">
             <div className="flex gap-x-1">
               {extraActions.map((extraAction) => (
-                <div key={extraAction.id} className={`w-8 h-7 ${extraAction.bgColor} rounded-xl flex items-center justify-center`}
+                <div key={extraAction.id} className={`w-8 h-7 ${extraAction.bgColor} rounded-xl flex items-center justify-center hover:opacity-80 cursor-pointer`}
                 onClick={() => {
                   if (extraAction.id === 5) setIsDeleteCard(true);
                   if (extraAction.id === 1) handleHarvestClick(pondId);
@@ -155,7 +155,7 @@ useEffect(() => {
             </button>
             {extraActions.find((action) => action.id === 5) && (
               <div
-                className={`w-8 h-7 bg-gray-600 rounded-xl flex items-center justify-center cursor-pointer`}
+                className={'w-8 h-7 bg-gray-600 rounded-xl flex items-center justify-center cursor-pointer hover:opacity-80'}
                 onClick={() => setIsDeleteCard(true)} // Xử lý khi nhấn vào action này
               >
                 {extraActions.find((action) => action.id === 5).icon}

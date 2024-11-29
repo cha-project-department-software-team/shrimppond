@@ -3,6 +3,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi';
 import { DashboardRequestApi } from '../../services/api';
+import InputField from '../InputField';
 
 function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) { 
     const [pondId, setPondId] = useState(''); // State để lưu giá trị của pondId và pondTypeId
@@ -60,6 +61,18 @@ function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) {
         }
     };
 
+    const handleInputChangeWithValidation = (setter) => (e) => {
+        const value = e.target.value;
+        
+        const regex = /^-?\d*(\.\d*)?$/;
+        if (regex.test(value) || value === '') {
+            setter(value); // Cập nhật giá trị nếu hợp lệ
+            setErrorMessage(''); // Xóa thông báo lỗi
+        } else {
+            setErrorMessage('Chỉ được nhập số thực!');
+        }
+    };
+
     return (
         <div 
             className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-20")} 
@@ -92,29 +105,28 @@ function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) {
                     </div>
                     
                     <div className="mb-2">
-                        <label htmlFor="deep" className="block text-left font-semibold mb-2">Độ sâu (m):</label>
-                        <input 
-                            type="number" 
-                            id="deep" 
-                            name="deep" 
+
+                        <InputField 
+                            label = "Độ sâu (m)"
+                            type="text" 
+                            id="deep"  
                             placeholder="Nhập độ sâu"
-                            value={deep} // Liên kết giá trị với state deep
-                            onChange={handleInputChange(setDeep)} // Gọi hàm khi người dùng nhập liệu
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" 
-                            min="0"
+                            value={deep} 
+                            onChange={handleInputChangeWithValidation(setDeep)}
                         />
                     </div>
 
+                    
+
                     <div className="mb-2">
-                        <label htmlFor="diameter" className="block text-left font-semibold mb-2">Đường kính (m):</label>
-                        <input 
-                            type="number" 
+                        <InputField 
+                            label = "Đường kính (m)"
+                            type="text" 
                             id="diameter" 
                             name="diameter" 
                             placeholder="Nhập đường kính"
                             value={diameter} // Liên kết giá trị với state diameter
-                            onChange={handleInputChange(setDiameter)} // Gọi hàm khi người dùng nhập liệu
-                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black" 
+                            onChange={handleInputChangeWithValidation(setDiameter)} // setDiameter
                             min="0"
                         />
                     </div>

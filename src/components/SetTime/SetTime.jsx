@@ -18,11 +18,11 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
 
     const callApi = useCallApi();
 
-    const handleCloseModal = (e) => {
-        if (e.target === e.currentTarget) {
-            setIsSetTime(false);
-        }
-    };
+    // const handleCloseModal = (e) => {
+    //     if (e.target === e.currentTarget) {
+    //         setIsSetTime(false);
+    //     }
+    // };
 
     const fetchData = useCallback(() => {
         setIsLoading(true);

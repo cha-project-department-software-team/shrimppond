@@ -1,39 +1,45 @@
-import { useState, memo } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import useCallApi from '../../hooks/useCallApi';
 import { DashboardRequestApi } from '../../services/api';
 import InputField from '../InputField';
 import FileInputField from '../FileInputField';
-
+import SelectField from '../SelectField'; // Import SelectField
 
 
 function ActiveCard({ pondId, setIsActiveModal, onDeleteCardSuccess }) {
     const [seedId, setSeedId] = useState('');
     const [seedName, setSeedName] = useState('');
-    const [originPondId, setOriginPondId] = useState(''); // Optional
-    const [certificates, setCertificates] = useState([]); // For storing base64 strings
+    const [originPondId, setOriginPondId] = useState(''); // For SelectField
+    const [certificates, setCertificates] = useState([]);
     const [sizeShrimp, setSizeShrimp] = useState(0);
     const [amountShrimp, setAmountShrimp] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [pondOptions, setPondOptions] = useState([]); // Options for SelectField
     const callApi = useCallApi();
 
-    // Convert uploaded file (image/pdf) to base64
-    // Convert file to base64 and remove the 'data:<MIME type>;base64,' part
-const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-          // Get the base64 string and remove the data URL scheme (MIME type prefix)
-          const base64String = reader.result.split(',')[1]; // Chỉ lấy phần base64 sau dấu ','
-          setCertificates([base64String]); // Store base64 string without the MIME type
-      };
-      reader.readAsDataURL(file); // Convert file to base64
-  }
-};
-
+    useEffect(() => {
+        callApi(
+            [
+                DashboardRequestApi.pondRequest.getPondRequest(), // Fetch pond data
+            ],
+            (res) => {
+                const ponds = res[0]; // Assuming res[0] contains the pond list
+                const filteredOptions = ponds
+                    .filter((pond) => pond.pondId !== pondId) // Exclude the current pondId
+                    .map((pond) => ({
+                        value: pond.pondId,
+                        label: pond.pondId,
+                    }));
+                setPondOptions(filteredOptions); // Set the filtered options
+            },
+            (err) => {
+                console.error("Failed to fetch ponds:", err);
+            }
+        );
+    }, [callApi, pondId]);
 
     const handleInputChange = (setter) => (e) => {
         setter(e.target.value);
@@ -48,23 +54,24 @@ const handleFileChange = (e) => {
                 pondId,
                 seedId: seedId.trim(),
                 seedName: seedName.trim(),
-                originPondId: originPondId.trim() || '', // Optional
+                originPondId: originPondId || '', // Optional
                 certificates,
                 sizeShrimp: parseFloat(sizeShrimp),
                 amountShrimp: parseFloat(amountShrimp)
             };
-            
 
             setIsLoading(true);
 
             callApi(
-                () => DashboardRequestApi.pondRequest.updatePondRequest(data), // Adjust API request accordingly
+                [
+                    DashboardRequestApi.pondRequest.updatePondRequest(data),
+                ],
                 (res) => {
                     setIsLoading(false);
-                    onDeleteCardSuccess(); // Callback on successful PUT
-                    setIsActiveModal(false); // Close modal
+                    onDeleteCardSuccess();
+                    setIsActiveModal(false);
                 },
-                'Cập nhật thành công!', // Success message
+                'Cập nhật thành công!',
                 (err) => {
                     setIsLoading(false);
                     setErrorMessage('Đã xảy ra lỗi, vui lòng thử lại!');
@@ -76,35 +83,56 @@ const handleFileChange = (e) => {
         }
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result.split(',')[1];
+                setCertificates([base64String]);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleInputChangeWithValidation = (setter) => (e) => {
+        const value = e.target.value;
+
+        // Chỉ cho phép số thực (có dấu . hoặc , hoặc số âm)
+        const regex = /^-?\d*(\.\d*)?$/;
+        if (regex.test(value) || value === '') {
+            setter(value); // Cập nhật giá trị nếu hợp lệ
+            setErrorMessage(''); // Xóa thông báo lỗi
+        } else {
+            setErrorMessage('Chỉ được nhập số thực!');
+        }
+    };
+
     return (
-        <div 
+        <div
             className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-20")}
-            onClick={(e) => e.target === e.currentTarget && setIsActiveModal(false)} // Close modal if clicked outside
+            onClick={(e) => e.target === e.currentTarget && setIsActiveModal(false)}
         >
             <div className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[400px] border-2 border-black">
-                {/* Close button */}
-                <i 
+                <i
                     className="absolute top-0 right-0 text-2xl p-3 cursor-pointer hover:bg-gray-400 rounded-full"
-                    onClick={() => setIsActiveModal(false)} 
+                    onClick={() => setIsActiveModal(false)}
                 >
                     <IoCloseSharp />
                 </i>
 
-                {/* Title */}
                 <header className="text-xl font-bold text-center uppercase mb-4">Kích hoạt Ao</header>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit}>
-                    {/* Seed ID and Seed Name on the same row */}
                     <div className="flex space-x-12 mb-2">
-                        <InputField 
+                        <InputField
                             label="Mã lô"
                             id="seedId"
                             value={seedId}
                             onChange={handleInputChange(setSeedId)}
                             placeholder="Nhập mã lô"
                         />
-                        <InputField 
+                        <InputField
                             label="Tên lô"
                             id="seedName"
                             value={seedName}
@@ -113,53 +141,48 @@ const handleFileChange = (e) => {
                         />
                     </div>
 
-                    {/* Origin Pond ID */}
-                    <InputField 
+                    {/* SelectField for Origin Pond ID */}
+                    <SelectField
                         label="Mã Ao gốc"
                         id="originPondId"
                         value={originPondId}
                         onChange={handleInputChange(setOriginPondId)}
-                        placeholder="Nhập mã ao gốc (có thể để trống)"
+                        options={pondOptions} // Use the pondOptions state
                     />
 
-                    {/* Certificates */}
-                    <FileInputField 
+                    <FileInputField
                         label="Giấy chứng nhận"
                         id="certificates"
                         onChange={handleFileChange}
                     />
 
-                    {/* Size Shrimp and Amount Shrimp on the same row */}
                     <div className="flex space-x-12 mb-2">
-                        <InputField 
+                        <InputField
                             label="Kích thước Tôm (cm)"
                             id="sizeShrimp"
                             type="number"
                             value={sizeShrimp}
-                            onChange={handleInputChange(setSizeShrimp)}
+                            onChange={handleInputChangeWithValidation(setSizeShrimp)} 
                             placeholder="Nhập kích thước tôm"
                             min="0"
                         />
-                        <InputField 
+                        <InputField
                             label="Số lượng Tôm (kg)"
                             id="amountShrimp"
                             type="number"
                             value={amountShrimp}
-                            onChange={handleInputChange(setAmountShrimp)}
+                            onChange={handleInputChangeWithValidation(setAmountShrimp)} // setAmountShrimp
                             placeholder="Nhập số lượng tôm"
                             min="0"
                         />
                     </div>
 
-                    {/* Error message */}
                     {errorMessage && (
                         <p className="text-red-600 text-center mb-2">{errorMessage}</p>
-                        // <p className="text-red-600 text-center mb-2">{base64}</p>
                     )}
 
-                    {/* Submit button */}
                     <div className="flex justify-center">
-                        <button 
+                        <button
                             type="submit"
                             className={cl("bg-green-300 hover:bg-green-400 text-black py-2 px-4 rounded-md shadow-md w-40", {
                                 'opacity-50 cursor-not-allowed': isLoading || !seedId || !seedName || sizeShrimp <= 0 || amountShrimp <= 0
