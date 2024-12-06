@@ -194,9 +194,9 @@ function Evista() {
         <div className="flex space-x-4">
         {Object.keys(pondData[pond] || {}).map((param) => {
           const data = pondData[pond][param].map((d) => ({
-            x: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            x: `${new Date(d.timestamp).getDate().toString().padStart(2, '0')}/${(new Date(d.timestamp).getMonth() + 1).toString().padStart(2, '0')}-${new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`,
             y: parseFloat(d.value),
-          }));
+          }))       ;
         
           let yAxisTitle = '';
           let yAxisStyle = {};
@@ -208,11 +208,10 @@ function Evista() {
               fontWeight: 'bold', 
               fontSize: '18px',
             };
-          }
-        
-          // Định dạng lại tên tham số
-          const formattedParam = param === 'Ph' ? 'pH' : param;
-        
+                  }
+              
+          const formattedParam = param === 'Ph' ? 'pH' : param        ;
+              
           return (
             <div key={param} className="parameter-chart w-1/3">
               <h3
@@ -247,7 +246,7 @@ function Evista() {
         </div>
       </div>
     ));
-  };
+  };  
 
   const closeModal = () => setIsModalOpen(false);
 
