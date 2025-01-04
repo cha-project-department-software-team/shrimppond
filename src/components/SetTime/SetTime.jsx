@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { IoCloseSharp } from "react-icons/io5";
 import cl from 'classnames';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -7,49 +7,42 @@ import { DashboardRequestApi } from '../../services/api';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-function SetTime({ setIsSetTime, onPostSuccess }) { 
-    const [timeFields, setTimeFields] = useState([{ hour: "", minute: "" }]);
-    const [previousTimes, setPreviousTimes] = useState([]); // Lưu danh sách thiết lập trước đó
-    const [showHistory, setShowHistory] = useState(false); // Điều khiển hiển thị lịch sử
+function SetTime({ setIsSetTime, onPostSuccess, isLoading, setIsLoading }) { 
+    const [timeFields, setTimeFields] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [dropdownVisible, setDropdownVisible] = useState({});
+    // const [isLoading, setIsLoading] = useState(false);
+    const [dropdownVisible, setDropdownVisible] = useState({ index: null, field: null });
     const dropdownRefs = useRef([]);
-
     const callApi = useCallApi();
 
-    // const handleCloseModal = (e) => {
-    //     if (e.target === e.currentTarget) {
-    //         setIsSetTime(false);
-    //     }
-    // };
-
+    // Fetch dữ liệu lịch sử từ API
     const fetchData = useCallback(() => {
         setIsLoading(true);
         callApi(
-            [
-                DashboardRequestApi.setTimeRequest.historySetTime(),
-            ], 
+            [DashboardRequestApi.setTimeRequest.historySetTime()],
             (res) => {
                 if (Array.isArray(res) && Array.isArray(res[0])) {
-                    const times = res[0].map(item => item.time); // Lấy mảng đầu tiên từ res
-                    setPreviousTimes(times);
+                    const times = res[0].map(item => {
+                        const [hour, minute] = item.time.split(':');
+                        return { hour, minute };
+                    });
+                    setTimeFields(times);
                 } else {
-                    setPreviousTimes([]); 
+                    setTimeFields([]);
                 }
-                setIsLoading(false); 
+                setIsLoading(false);
             },
             () => {
                 console.error("Gọi API thất bại");
-                setPreviousTimes([]);
+                setTimeFields([]);
                 setIsLoading(false);
             }
         );
     }, [callApi]);
-      
+
     useEffect(() => {
-        fetchData()
-      }, [fetchData]);
+        fetchData();
+    }, [fetchData]);
 
     const handleAddTimeField = () => {
         setTimeFields([...timeFields, { hour: "", minute: "" }]);
@@ -61,17 +54,21 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
     };
 
     const toggleDropdown = (index, field) => {
-        setDropdownVisible({ index, field });
+        setDropdownVisible((prev) =>
+            prev.index === index && prev.field === field
+                ? { index: null, field: null }
+                : { index, field }
+        );
     };
 
     const handleTimeChange = (index, field, value) => {
         const newTimeFields = [...timeFields];
         newTimeFields[index][field] = value;
         setTimeFields(newTimeFields);
-        setDropdownVisible({});
+        setDropdownVisible({ index: null, field: null });
     };
 
-    const hourOptions = Array.from({ length: 25 }, (_, i) => i.toString());
+    const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
     const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
 
     const handleSubmit = (e) => {
@@ -87,11 +84,10 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
 
             callApi(
                 () => DashboardRequestApi.timeRequest.setTimeRequest(data),
-                (res) => {
+                () => {
                     setIsLoading(false);
                     toast.success("Đã thiết lập thời gian thành công!");
                     setErrorMessage('');
-                    setTimeFields([{ hour: "", minute: "" }]);
                     setIsSetTime(false);
                     onPostSuccess();
                 },
@@ -109,18 +105,10 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
         }
     };
 
-    const handleCloseDropdown = () =>{
-        setDropdownVisible({});
-    } 
-
-    const handlePrevent = (event) => {
-        event.stopPropagation();
-    }
-
     return (
         <div 
-            className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-50")}
-            onClick = {handleCloseDropdown}
+            className={cl("fixed inset-0 flex items-center justify-center bg-gray-200 bg-opacity-30 z-9")}
+            onClick={() => setDropdownVisible({ index: null, field: null })}
         >
             <div className="relative bg-white p-6 rounded-lg shadow-lg w-[600px] min-h-[200px] border-2 border-black">
                 <i 
@@ -131,15 +119,13 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                 </i>
                 <header className="text-xl font-bold text-center uppercase mb-4">Thiết Lập Thời Gian</header>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
                     {timeFields.map((time, index) => (
                         <div className="flex mb-2 items-center space-x-2" key={index}>
-                            <h2 className='font-semibold'>Thiết lập lần đo {index + 1}</h2>
+                            <h2 className="font-semibold">Lần đo {index + 1}</h2>
                             
-                            {/* Hour Dropdown */}
-                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], hour: el })}
-                                onClick = {handlePrevent}    
-                            >
+                            {/* Dropdown giờ */}
+                            <div className="relative flex-1">
                                 <input 
                                     type="text"
                                     placeholder="Chọn giờ"
@@ -162,11 +148,9 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                                     </div>
                                 )}
                             </div>
-                            
-                            {/* Minute Dropdown */}
-                            <div className="relative flex-1" ref={(el) => (dropdownRefs.current[index] = { ...dropdownRefs.current[index], minute: el })}
-                                onClick = {handlePrevent}    
-                            >
+
+                            {/* Dropdown phút */}
+                            <div className="relative flex-1">
                                 <input 
                                     type="text"
                                     placeholder="Chọn phút"
@@ -216,35 +200,10 @@ function SetTime({ setIsSetTime, onPostSuccess }) {
                             })}
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Đang xử lý...' : 'Xác nhận'}
-                        </button>
-                        <button 
-                            type ="button"
-                            className="bg-gray-300 hover:bg-gray-400 text-black py-1 px-3 rounded-md shadow-md"
-                            onClick={() => setShowHistory(!showHistory)}
-                        >
-                            Xem lịch sử
+                            {isLoading ? 'Đang xử lý...' : 'Lưu'}
                         </button>
                     </div>
                 </form>
-               {/* Danh sách lịch sử */}
-               {showHistory && (
-                    <div className="absolute top-30 right-0 bg-gray-50 p-4 border rounded-md max-h-40 overflow-y-auto shadow-lg w-64 z-50">
-                        <h2 className="font-semibold mb-2">Danh sách lần đo:</h2>
-                        <ul className="list-disc ml-5 space-y-1">
-                            {previousTimes.length > 0 ? (
-                                previousTimes.map((time, index) => (
-                                    <li key={index} className ="flex">
-                                        <p className="font-semibold">Lần đo {index + 1}:</p>
-                                        <span>{time}</span>
-                                    </li>
-                                ))
-                            ) : (
-                                <li>Chưa có dữ liệu</li>
-                            )}
-                        </ul>
-                    </div>
-                )}
             </div>
         </div>
     );

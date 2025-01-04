@@ -146,6 +146,8 @@ function Dashboard() {
         {isSetTime && <SetTime 
             setIsSetTime={setIsSetTime} 
             onPostSuccess={fetchData}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
         />}
 
 
