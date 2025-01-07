@@ -1,11 +1,11 @@
 
 
 const paths ={
-    dashboard: "/",//
+    dashboard: "/dashboard",//
     evista: "/evista",//
     status: "/status",
     food: "/food",//
-    account: "/account",
+    account: "/",
     access: "/access",//
     harvest: "/harvest",//
     move: "/move",//

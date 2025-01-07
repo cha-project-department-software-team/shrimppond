@@ -2,17 +2,15 @@ import React, { useLayoutEffect, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TfiAlignJustify } from 'react-icons/tfi';
 import { FiLogOut } from 'react-icons/fi';
-import { BsGrid, BsDroplet, BsBox, BsShuffle, BsInfoCircle, BsSearch, BsFileText } from 'react-icons/bs';
+import { BsGrid, BsDroplet, BsBox, BsSearch, BsFileText } from 'react-icons/bs';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../store/sidebarSlice';
 
 function Sidebar() {
   const menuItems = [
-    { name: "Dashboard", icon: <BsGrid />, lnk: "/" },
+    { name: "Dashboard", icon: <BsGrid />, lnk: "/dashboard" },
     { name: "Thông số môi trường", icon: <BsDroplet />, lnk: "/evista" },
     { name: "Thu hoạch", icon: <BsBox />, lnk: "/harvest" },
-    // { name: "Chuyển ao", icon: <BsShuffle />, lnk: "/move" },
-    // { name: "Cập nhật thông tin", icon: <BsInfoCircle />, lnk: "/food" },
     { name: "Truy xuất nguồn gốc", icon: <BsSearch />, lnk: "/access" },
     { name: "Thông tin trang trại", icon: <BsFileText />, lnk: "/status" },
   ];
@@ -26,17 +24,30 @@ function Sidebar() {
   const [active, setActive] = React.useState("Dashboard");
   const [showDelayed, setShowDelayed] = React.useState(false);
 
-useEffect(() => {
-  if (expanded) {
-    const timeout = setTimeout(() => {
-      setShowDelayed(true);
-    }, 150);
-    return () => clearTimeout(timeout); 
-  } else {
-    setShowDelayed(false);
-  }
-}, [expanded]);
+  const [username, setUsername] = React.useState(null);
 
+  // Kiểm tra localStorage và điều hướng nếu không có token hoặc username
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const token = localStorage.getItem("token");
+
+    if (!token || !storedUsername) {
+      navigate("/"); // Điều hướng về trang đăng nhập
+    } else {
+      setUsername(storedUsername); // Lưu username vào state
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (expanded) {
+      const timeout = setTimeout(() => {
+        setShowDelayed(true);
+      }, 150);
+      return () => clearTimeout(timeout); 
+    } else {
+      setShowDelayed(false);
+    }
+  }, [expanded]);
 
   useLayoutEffect(() => {
     if (location.pathname === "/") {
@@ -54,12 +65,10 @@ useEffect(() => {
   }, [location.pathname, menuItems]);
 
   const handleLogout = () => {
-    // Xóa token hoặc dữ liệu phiên đăng nhập
-    localStorage.removeItem('authToken');
-    sessionStorage.removeItem('authToken');
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
 
-    // Điều hướng về trang đăng nhập
-    navigate('/account');
+    navigate("/"); // Điều hướng về trang đăng nhập
   };
 
   return (
@@ -126,7 +135,7 @@ useEffect(() => {
         <div className="border-t p-3 flex justify-between items-center">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gray-400 rounded-full mr-2"></div>
-            {expanded && <span className="text-white">Admin</span>}
+            {expanded && <span className="text-white">{username || "Admin"}</span>}
           </div>
           <button
             onClick={handleLogout}

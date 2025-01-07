@@ -11,11 +11,27 @@ function StatusPage() {
     const [farmName, setFarmName] = useState('');
     const [farmAddress, setFarmAddress] = useState('');
     const [loading, setLoading] = useState(false); // Loading state
+    const [username, setUsername] = useState(''); // Username từ localStorage
+
+    // Lấy username từ localStorage khi trang tải
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            setUsername(storedUsername);
+        } else {
+            // Nếu không có username trong localStorage, chuyển hướng về trang login
+            toast.error('Vui lòng đăng nhập lại!');
+            navigate('/login');
+        }
+    }, [navigate]);
 
     // Gọi API để lấy danh sách trang trại
     const fetchFarms = async () => {
+        if (!username) return; // Không gọi API nếu username chưa được set
+
         setLoading(true); // Start loading
-        const url = 'https://shrimppond.runasp.net/api/Farm?pageSize=200&pageNumber=1';
+        const url = `http://shrimppond.runasp.net/api/Farm?userName=${username}&pageSize=200&pageNumber=1`;
+        console.log(username)
         try {
             const response = await axios.get(url);
             const farmData = response.data.map((farm, index) => ({
@@ -33,14 +49,14 @@ function StatusPage() {
     };
 
     useEffect(() => {
-        fetchFarms(); // Lấy danh sách trang trại khi trang được tải
-    }, []);
+        fetchFarms(); // Lấy danh sách trang trại khi username có sẵn
+    }, [username]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!farmName || !farmAddress) {
-            alert('Vui lòng nhập cả tên và địa chỉ trang trại.');
+            toast.error('Vui lòng nhập cả tên và địa chỉ trang trại.');
             return;
         }
 
@@ -53,20 +69,20 @@ function StatusPage() {
         try {
             setLoading(true); // Start loading when adding farm
 
-            // Reset lại danh sách farm (cho đến khi có dữ liệu mới từ API)
-            setFarms([]); // Tạm thời reset danh sách trang trại
-
-            const response = await axios.post('https://shrimppond.runasp.net/api/Farm', newFarm);
+            const response = await axios.post('https://shrimppond.runasp.net/api/Farm', {
+                ...newFarm,
+                userName: username, // Đính kèm username vào API
+            });
 
             // Sau khi thêm trang trại thành công, tải lại danh sách trang trại
             fetchFarms();
 
             setFarmName('');
             setFarmAddress('');
-            toast.success('Thêm trang trại thành công!'); // Hiển thị thông báo thành công
+            toast.success('Thêm trang trại thành công!');
         } catch (error) {
             console.error('Failed to add farm:', error);
-            toast.error('Không thể thêm trang trại. Vui lòng thử lại.'); // Hiển thị thông báo lỗi
+            toast.error('Không thể thêm trang trại. Vui lòng thử lại.');
         } finally {
             setLoading(false); // End loading
         }
@@ -75,14 +91,15 @@ function StatusPage() {
     const deleteFarm = async (farmName) => {
         try {
             setLoading(true); // Start loading when deleting farm
-            await axios.delete(`https://shrimppond.runasp.net/api/Farm?FarmName=${encodeURIComponent(farmName)}`);
-            // Cập nhật lại danh sách farms sau khi xóa thành công
-            fetchFarms(); // Tải lại danh sách trang trại sau khi xóa
+            await axios.delete(`https://shrimppond.runasp.net/api/Farm?FarmName=${encodeURIComponent(farmName)}&userName=${username}`);
 
-            toast.success('Xóa trang trại thành công!'); // Hiển thị thông báo thành công
+            // Cập nhật lại danh sách farms sau khi xóa thành công
+            fetchFarms();
+
+            toast.success('Xóa trang trại thành công!');
         } catch (error) {
             console.error('Failed to delete farm:', error);
-            toast.error('Không thể xóa trang trại. Vui lòng thử lại.'); // Hiển thị thông báo lỗi
+            toast.error('Không thể xóa trang trại. Vui lòng thử lại.');
         } finally {
             setLoading(false); // End loading
         }
@@ -130,7 +147,6 @@ function StatusPage() {
                         </button>
                     </form>
 
-                    {/* Hiển thị spinner loading nếu đang tải dữ liệu */}
                     {loading ? (
                         <div className="flex justify-center items-center space-x-2">
                             <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-solid rounded-full animate-spin border-t-blue-500"></div>
@@ -138,14 +154,13 @@ function StatusPage() {
                         </div>
                     ) : (
                         <div>
-                            {/* Danh sách trang trại */}
                             <h2 className="text-lg font-semibold">Danh sách trang trại</h2>
                             <div className="max-h-56 overflow-y-auto divide-y divide-gray-200">
                                 {farms.map(farm => (
                                     <div key={farm.id} className="flex justify-between items-center p-2">
                                         <span
                                             className="cursor-pointer text-blue-500 hover:underline"
-                                            onClick={handleFarmClick} // Khi click vào tên trang trại, chuyển đến Dashboard
+                                            onClick={handleFarmClick}
                                         >
                                             {farm.name} - {farm.address}
                                         </span>
@@ -163,7 +178,6 @@ function StatusPage() {
                 </div>
             </div>
 
-            {/* ToastContainer để hiển thị các thông báo toast */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}

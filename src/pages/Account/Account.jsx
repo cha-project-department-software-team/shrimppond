@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Register from "../../components/Register";
 import useCallApi from "../../hooks/useCallApi"; // Hook gọi API
@@ -13,6 +13,17 @@ function Account() {
   const [isLoading, setIsLoading] = useState(false);
 
   const isLoginEnabled = username.trim() !== "" && password.trim() !== "";
+
+  // Kiểm tra trạng thái đăng nhập
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
+
+    if (token && username) {
+      // Tự động chuyển hướng đến dashboard nếu đã đăng nhập
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
   // Hàm đăng nhập
   const handleLogin = useCallback(() => {
@@ -37,7 +48,7 @@ function Account() {
           localStorage.setItem("username", loginData.username);
 
           // Chuyển hướng sang dashboard
-          navigate("/");
+          navigate("/dashboard");
         } else {
           alert("Phản hồi từ server không hợp lệ!"); // Thông báo lỗi đơn giản
         }
