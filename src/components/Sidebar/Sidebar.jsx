@@ -59,7 +59,7 @@ useEffect(() => {
     sessionStorage.removeItem('authToken');
 
     // Điều hướng về trang đăng nhập
-    navigate('/login');
+    navigate('/account');
   };
 
   return (
