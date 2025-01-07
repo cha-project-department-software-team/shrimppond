@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Register from "../../components/Register";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { DashboardRequestApi } from "../../services/api"; // API service của bạn
-import useCallApi from "../../hooks/useCallApi"; // Hook nếu bạn cần thêm
+import useCallApi from "../../hooks/useCallApi"; // Hook gọi API
+import { DashboardRequestApi } from "../../services/api"; // Dịch vụ API
 
 function Account() {
   const navigate = useNavigate();
-  const callApi = useCallApi(); // Nếu bạn cần
+  const callApi = useCallApi(); // Hook API
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -16,83 +14,50 @@ function Account() {
 
   const isLoginEnabled = username.trim() !== "" && password.trim() !== "";
 
-  // Hàm được gọi khi đăng ký thành công
-  const handleRegisterSuccess = () => {
-    toast.success("Tài khoản đã được tạo thành công!", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-    });
-  };
-
-  // Hàm xử lý đăng nhập
-  const handleLogin = async () => {
+  // Hàm đăng nhập
+  const handleLogin = useCallback(() => {
     if (!isLoginEnabled) return;
 
-    setIsLoading(true); // Bật trạng thái loading
+    setIsLoading(true);
+
     const loginData = {
       username: username.trim(),
       password: password.trim(),
     };
 
-    try {
-      // Gọi API đăng nhập
-      const response = await DashboardRequestApi.authRequest.login(loginData);
+    // Gọi API thông qua hook callApi
+    callApi(
+      [DashboardRequestApi.authRequest.login(loginData)], // Gửi request login
+      (res) => {
+        console.log(">>> Response từ API:", res);
 
-      // Kiểm tra phản hồi từ server
-      if (response && response.data && response.data.token) {
-        const { token } = response.data;
+        if (res && res[0] && res[0].token) {
+          // Lưu token và username vào localStorage
+          localStorage.setItem("token", res[0].token);
+          localStorage.setItem("username", loginData.username);
 
-        // Lưu token và username vào localStorage
-        localStorage.setItem("token", token);
-        localStorage.setItem("username", username);
-
-        // Thông báo thành công
-        toast.success("Đăng nhập thành công!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-        });
-
-        // Chuyển hướng sang trang dashboard
-        navigate("/dashboard");
-      } else {
-        toast.error("Phản hồi từ server không hợp lệ!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-        });
+          // Chuyển hướng sang dashboard
+          navigate("/");
+        } else {
+          alert("Phản hồi từ server không hợp lệ!"); // Thông báo lỗi đơn giản
+        }
+        setIsLoading(false); // Thoát trạng thái loading
+      },
+      (error) => {
+        // Xử lý lỗi
+        if (error.response?.status === 401) {
+          alert("Sai tên đăng nhập hoặc mật khẩu!");
+        } else {
+          alert("Có lỗi xảy ra. Vui lòng thử lại sau!");
+        }
+        setIsLoading(false); // Thoát trạng thái loading khi thất bại
       }
-    } catch (error) {
-      console.error("Đăng nhập thất bại:", error);
+    );
+  }, [callApi, username, password, isLoginEnabled, navigate]);
 
-      // Hiển thị thông báo lỗi cụ thể
-      if (error.response?.status === 401) {
-        toast.error("Sai tên đăng nhập hoặc mật khẩu!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-        });
-      } else {
-        toast.error("Có lỗi xảy ra. Vui lòng thử lại sau!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-        });
-      }
-    } finally {
-      setIsLoading(false); // Tắt trạng thái loading
-    }
+  // Hàm được gọi khi đăng ký thành công
+  const handleRegisterSuccess = () => {
+    alert("Tài khoản đã được tạo thành công!");
   };
 
   return (
@@ -117,7 +82,7 @@ function Account() {
         </div>
         <button
           onClick={handleLogin}
-          disabled={!isLoginEnabled || isLoading} // Vô hiệu hoá nếu thiếu thông tin hoặc đang xử lý
+          disabled={!isLoginEnabled || isLoading}
           className={`w-full py-2 text-white font-semibold rounded-md ${
             isLoginEnabled
               ? "bg-red-500 hover:bg-red-600 cursor-pointer"
@@ -138,19 +103,9 @@ function Account() {
       {isRegisterOpen && (
         <Register
           setIsRegister={setIsRegisterOpen}
-          onRegisterSuccess={handleRegisterSuccess} // Truyền callback
+          onRegisterSuccess={handleRegisterSuccess}
         />
       )}
-
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-      />
     </div>
   );
 }
