@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Register from "../../components/Register";
 import useCallApi from "../../hooks/useCallApi"; // Hook gọi API
 import { DashboardRequestApi } from "../../services/api"; // Dịch vụ API
+import { IoEye, IoEyeOff } from "react-icons/io5"; // Icon con mắt
 
 function Account() {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ function Account() {
   const [password, setPassword] = useState("");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Trạng thái hiển thị mật khẩu
+  const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
 
   const isLoginEnabled = username.trim() !== "" && password.trim() !== "";
 
@@ -30,6 +33,7 @@ function Account() {
     if (!isLoginEnabled) return;
 
     setIsLoading(true);
+    setErrorMessage(""); // Xóa thông báo lỗi trước khi bắt đầu đăng nhập
 
     const loginData = {
       username: username.trim(),
@@ -50,16 +54,16 @@ function Account() {
           // Chuyển hướng sang dashboard
           navigate("/dashboard");
         } else {
-          alert("Phản hồi từ server không hợp lệ!"); // Thông báo lỗi đơn giản
+          setErrorMessage("Tài khoản hoặc mật khẩu không đúng!"); // Thông báo lỗi
         }
         setIsLoading(false); // Thoát trạng thái loading
       },
       (error) => {
         // Xử lý lỗi
         if (error.response?.status === 401) {
-          alert("Sai tên đăng nhập hoặc mật khẩu!");
+          setErrorMessage("Sai tên đăng nhập hoặc mật khẩu!");
         } else {
-          alert("Có lỗi xảy ra. Vui lòng thử lại sau!");
+          setErrorMessage("Có lỗi xảy ra. Vui lòng thử lại sau!");
         }
         setIsLoading(false); // Thoát trạng thái loading khi thất bại
       }
@@ -83,13 +87,15 @@ function Account() {
             onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
+          <div className="relative">
+            <input
+              type={isPasswordVisible ? "text" : "password"} // Hiển thị hoặc ẩn mật khẩu
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+          </div>
         </div>
         <button
           onClick={handleLogin}
@@ -102,6 +108,10 @@ function Account() {
         >
           {isLoading ? "Đang xử lý..." : "Login"}
         </button>
+        {/* Hiển thị thông báo lỗi bên dưới nút Login */}
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center mt-2">{errorMessage}</p>
+        )}
         <div
           onClick={() => setIsRegisterOpen(true)}
           className="mt-4 text-sm text-blue-500 hover:text-blue-700 cursor-pointer text-center font-semibold"
