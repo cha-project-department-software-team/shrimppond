@@ -1,332 +1,204 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { infoRequestApi } from '../../services/api';
+import React, { useState, useCallback, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer và toast
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS cho react-toastify
+import Loading from '../../components/Loading';
+import useCallApi from '../../hooks/useCallApi';
+import { FarmRequestApi } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 function Food() {
+    const [farms, setFarms] = useState([]); // Danh sách trang trại
+    const [farmName, setFarmName] = useState(''); // Tên trang trại
+    const [farmAddress, setFarmAddress] = useState(''); // Địa chỉ trang trại
+    const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
+
+    const callApi = useCallApi();
     const navigate = useNavigate();
-    const [selectedPond, setSelectedPond] = useState("A1");
-    const [pondData, setPondData] = useState({
-        A1: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' },
-        A2: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' },
-        A3: { date: '', foodRows: [{ name: "", type: "", quantity: "" }], medicineRows: [{ name: "", type: "", quantity: "" }], infoType: 'thucan' }
-    });
-    const [foodNames, setFoodNames] = useState(["Tên"]);
-    const [foodTypes, setFoodTypes] = useState(["Loại"]);
-    const [medicineNames, setMedicineNames] = useState(["Tên"]);
-    const [medicineTypes, setMedicineTypes] = useState(["Loại"]);
-    const [newName, setNewName] = useState("");
-    const [newType, setNewType] = useState("");
 
-    const [foodHistory, setFoodHistory] = useState([]);
-    const [medicineHistory, setMedicineHistory] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const username = localStorage.getItem('username');
 
-    const handleAddName = () => {
-        if (pondData[selectedPond].infoType === 'thucan') {
-            if (newName && !foodNames.includes(newName)) {
-                setFoodNames([...foodNames, newName]);
+    const handleDeleteFarm = useCallback(
+        (farmName) => {
+            if (!window.confirm('Bạn có chắc chắn muốn xóa trang trại này?')) {
+                return;
             }
-        } else {
-            if (newName && !medicineNames.includes(newName)) {
-                setMedicineNames([...medicineNames, newName]);
-            }
-        }
-        setNewName("");
-    };
+    
+            setIsLoading(true);
+            console.log(farmName)
 
-    const handleAddType = () => {
-        if (pondData[selectedPond].infoType === 'thucan') {
-            if (newType && !foodTypes.includes(newType)) {
-                setFoodTypes([...foodTypes, newType]);
-            }
-        } else {
-            if (newType && !medicineTypes.includes(newType)) {
-                setMedicineTypes([...medicineTypes, newType]);
-            }
-        }
-        setNewType("");
-    };
+            callApi(
+                [FarmRequestApi.farmRequest.deleteFarm(username ,farmName)],
+                () => {
+                    setIsLoading(false);
+                    toast.success('Xóa trang trại thành công!');
+                    setFarms(farms.filter((farm) => farm.farmName !== farmName));
+                },
+                (err) => {
+                    setIsLoading(false);
+                    if (err?.response?.data?.title === 'PondType is still exits in Farm') {
+                        toast.error('Vẫn còn khối ao ở farm!'); // Thông báo lỗi cụ thể
+                    } else {
+                        toast.error('Có lỗi xảy ra khi xóa trang trại!');
+                    }
+                    console.error(err);
+                }
+            );
+        },
+        [callApi, farms]
+    );
+    
+    
 
-    const handleAddRow = () => {
-        setPondData((prevData) => ({
-            ...prevData,
-            [selectedPond]: {
-                ...prevData[selectedPond],
-                [pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']: [
-                    ...prevData[selectedPond][pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows'],
-                    { name: "", type: "", quantity: "" }
-                ]
-            }
-        }));
-    };
-
-    const handleRowChange = (index, field, value) => {
-        const updatedRows = [...pondData[selectedPond][pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']];
-        updatedRows[index][field] = value;
-        setPondData((prevData) => ({
-            ...prevData,
-            [selectedPond]: {
-                ...prevData[selectedPond],
-                [pondData[selectedPond].infoType === 'thucan' ? 'foodRows' : 'medicineRows']: updatedRows
-            }
-        }));
-    };
-
-    const handleDateChange = (date) => {
-        setPondData((prevData) => ({
-            ...prevData,
-            [selectedPond]: {
-                ...prevData[selectedPond],
-                date: date
-            }
-        }));
-    };
-
-    const handleInfoTypeChange = (infoType) => {
-        setPondData((prevData) => ({
-            ...prevData,
-            [selectedPond]: {
-                ...prevData[selectedPond],
-                infoType: infoType
-                // Không reset rows ở đây
-            }
-        }));
-    };
-
-    const handlePondChange = (pond) => {
-        setSelectedPond(pond);
-    };
-
-    const handleUpdate = () => {
-        const currentData = pondData[selectedPond];
-        const updateRecord = {
-            pond: selectedPond,
-            date: currentData.date,
-            infoType: currentData.infoType,
-            rows: [...(currentData.infoType === 'thucan' ? currentData.foodRows : currentData.medicineRows)]
-        };
-
-        if (currentData.infoType === 'thucan') {
-            setFoodHistory((prevHistory) => [...prevHistory, updateRecord]);
-        } else {
-            setMedicineHistory((prevHistory) => [...prevHistory, updateRecord]);
+    const fetchFarms = useCallback(() => {
+        if (!username) {
+            toast.error('Không tìm thấy thông tin người dùng!');
+            return;
         }
 
-        alert(`Data for pond ${selectedPond} has been updated!`);
-    };
+        callApi(
+            [
+                FarmRequestApi.farmRequest.getAllFarmByUserName(username),
+            ],
+            (res) => {
+                setFarms(res[0].flat());
+            },
+            (err) => {
+                toast.error('Không thể tải danh sách trang trại!');
+                console.error(err);
+            }
+        );
+    }, [callApi, username]);
 
-    const isThucAn = pondData[selectedPond].infoType === 'thucan';
-    const dateLabel = isThucAn ? 'Ngày cho ăn' : 'Ngày điều trị';
-    const quantityLabel = isThucAn ? 'Số lượng (kg)' : 'Liều lượng (g)';
-    const names = isThucAn ? foodNames : medicineNames;
-    const types = isThucAn ? foodTypes : medicineTypes;
-    const rows = isThucAn ? pondData[selectedPond].foodRows : pondData[selectedPond].medicineRows;
+    const handleAddFarm = useCallback(
+        (e) => {
+            e.preventDefault();
+
+            if (!farmName.trim() || !farmAddress.trim()) {
+                toast.error('Tên trang trại và địa chỉ không được để trống!');
+                return;
+            }
+
+            const data = {
+                farmName: farmName.trim(),
+                address: farmAddress.trim(),
+                username, 
+            };
+            console.log(data)
+
+            setIsLoading(true);
+
+            callApi(
+                [
+                    FarmRequestApi.farmRequest.createFarm(data),
+                ],
+                (res) => {
+                    setIsLoading(false);
+                    toast.success('Thêm trang trại thành công!');
+                    setFarms([...farms, res[0]]); // Thêm trang trại mới vào danh sách
+                    setFarmName(''); // Reset tên trang trại
+                    setFarmAddress(''); // Reset địa chỉ
+                },
+                (err) => {
+                    setIsLoading(false);
+                    toast.error('Có lỗi xảy ra khi thêm trang trại!');
+                    console.error(err);
+                }
+            );
+        },
+        [farmName, farmAddress, farms, username, callApi]
+    );
+
+    useEffect(() => {
+        fetchFarms();
+    }, [fetchFarms]);
 
     return (
-        <>
-            <div className="flex">
-                <Sidebar />
-                <div className="flex flex-col w-full p-8 bg-gray-50">
-                    <div className="flex space-x-4 mb-6">
-                        <div className="w-1/2">
-                            <label htmlFor="pond" className="block text-sm font-medium text-gray-700">Chọn ao</label>
-                            <select
-                                id="pond"
-                                value={selectedPond}
-                                onChange={(e) => handlePondChange(e.target.value)}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
-                            >
-                                <option value="A1">Ao: A1</option>
-                                <option value="A2">Ao: A2</option>
-                                <option value="A3">Ao: A3</option>
-                            </select>
-                        </div>
-                        <div className="w-1/2">
-                            <label htmlFor="info" className="block text-sm font-medium text-gray-700">Thông tin</label>
-                            <select
-                                id="info"
-                                value={pondData[selectedPond].infoType}
-                                onChange={(e) => handleInfoTypeChange(e.target.value)}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
-                            >
-                                <option value="thucan">Thức ăn</option>
-                                <option value="thuoc">Thuốc</option>
-                            </select>
-                        </div>
+        <div className="flex max-h-screen">
+
+            <div className="flex-1 p-6">
+                <h1 className="text-2xl font-bold mb-6">Thông tin trang trại</h1>
+
+                {/* Form thêm trang trại */}
+                <form onSubmit={handleAddFarm} className="mb-6">
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2" htmlFor="farmName">
+                            Trang trại
+                        </label>
+                        <input
+                            id="farmName"
+                            type="text"
+                            value={farmName}
+                            onChange={(e) => setFarmName(e.target.value)}
+                            placeholder="Tên trang trại"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                        />
                     </div>
 
-                    <div className="flex flex-col space-y-6">
-                        <div className="flex space-x-4">
-                            <div className="w-1/2">
-                                <label htmlFor="pondName" className="block text-sm font-medium text-gray-700">Ao</label>
-                                <input type="text" id="pondName" value={selectedPond} disabled className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
-                            </div>
-                            <div className="w-1/2">
-                                <label htmlFor="date" className="block text-sm font-medium text-gray-700">{dateLabel}</label>
-                                <input
-                                    type="date"
-                                    id="date"
-                                    value={pondData[selectedPond].date}
-                                    onChange={(e) => handleDateChange(e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex space-x-4">
-                            <div className="w-1/2">
-                                <label htmlFor="newName" className="block text-sm font-medium text-gray-700">Thêm Tên mới</label>
-                                <div className="flex space-x-2">
-                                    <input 
-                                        type="text" 
-                                        id="newName" 
-                                        value={newName} 
-                                        onChange={(e) => setNewName(e.target.value)} 
-                                        placeholder="Nhập tên mới"
-                                        className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    />
-                                    <button onClick={handleAddName} className="text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">+</button>
-                                </div>
-                            </div>
-                            <div className="w-1/2">
-                                <label htmlFor="newType" className="block text-sm font-medium text-gray-700">Thêm Loại mới</label>
-                                <div className="flex space-x-2">
-                                    <input 
-                                        type="text" 
-                                        id="newType" 
-                                        value={newType} 
-                                        onChange={(e) => setNewType(e.target.value)} 
-                                        placeholder="Nhập loại mới"
-                                        className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    />
-                                    <button onClick={handleAddType} className="text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-200 shadow-sm rounded-md">
-                                <thead>
-                                    <tr>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tên</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Loại</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{quantityLabel}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rows.map((row, index) => (
-                                        <tr key={index} className={`bg-gray-${index % 2 === 0 ? '50' : '100'}`}>
-                                            <td className="px-6 py-4 border-b border-gray-200">
-                                                <select
-                                                    value={row.name}
-                                                    onChange={(e) => handleRowChange(index, 'name', e.target.value)}
-                                                    className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                >
-                                                    {(isThucAn ? foodNames : medicineNames).map((name, i) => (
-                                                        <option key={i} value={name}>{name}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
-                                            <td className="px-6 py-4 border-b border-gray-200">
-                                                <select
-                                                    value={row.type}
-                                                    onChange={(e) => handleRowChange(index, 'type', e.target.value)}
-                                                    className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                >
-                                                    {(isThucAn ? foodTypes : medicineTypes).map((type, i) => (
-                                                        <option key={i} value={type}>{type}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
-                                            <td className="px-6 py-4 border-b border-gray-200">
-                                                <input
-                                                    type="number"
-                                                    className="block w-full bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                                    placeholder={quantityLabel}
-                                                    value={row.quantity}
-                                                    onChange={(e) => handleRowChange(index, 'quantity', e.target.value)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2" htmlFor="farmAddress">
+                            Địa chỉ
+                        </label>
+                        <input
+                            id="farmAddress"
+                            type="text"
+                            value={farmAddress}
+                            onChange={(e) => setFarmAddress(e.target.value)}
+                            placeholder="Địa chỉ trang trại"
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                        />
                     </div>
 
-                    <div className="flex justify-between space-x-4 mt-4">
-                        <button onClick={handleAddRow} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">+ Thêm hàng</button>
-                        <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Cập nhật</button>
-                        <button 
-                            onClick={() => setIsModalOpen(true)} 
-                            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
+                    >
+                        Thêm trang trại
+                    </button>
+                </form>
+
+                <h2 className="text-lg font-bold mb-4">Danh sách trang trại</h2>
+                <ul className="list-none space-y-4">
+                    {farms.map((farm, index) => (
+                        <li
+                            key={index}
+                            className="flex justify-between items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg"
                         >
-                            Report
-                        </button>
-                    </div>
-
-                    {/* Modal hiển thị lịch sử cập nhật */}
-                    {isModalOpen && (
-                        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                            <div className="bg-white p-6 rounded-md shadow-lg w-1/2">
-                                <h2 className="text-xl font-semibold mb-4">Lịch sử cập nhật</h2>
-                                <h3 className="font-semibold mb-2">Thức ăn</h3>
-                                <ul className="max-h-64 overflow-y-auto">
-                                    {foodHistory.length === 0 ? (
-                                        <li className="text-gray-600">Không có lịch sử cập nhật thức ăn.</li>
-                                    ) : (
-                                        foodHistory.map((record, index) => (
-                                            <li key={index} className="mb-4 border-b pb-2">
-                                                <p><strong>Ao:</strong> {record.pond}</p>
-                                                <p><strong>Ngày:</strong> {record.date}</p>
-                                                <p><strong>Chi tiết:</strong></p>
-                                                <ul>
-                                                    {record.rows.map((row, idx) => (
-                                                        <li key={idx}>
-                                                            {row.name} - {row.type} - {row.quantity}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </li>
-                                        ))
-                                    )}
-                                </ul>
-                                <h3 className="font-semibold mb-2">Thuốc</h3>
-                                <ul className="max-h-64 overflow-y-auto">
-                                    {medicineHistory.length === 0 ? (
-                                        <li className="text-gray-600">Không có lịch sử cập nhật thuốc.</li>
-                                    ) : (
-                                        medicineHistory.map((record, index) => (
-                                            <li key={index} className="mb-4 border-b pb-2">
-                                                <p><strong>Ao:</strong> {record.pond}</p>
-                                                <p><strong>Ngày:</strong> {record.date}</p>
-                                                <p><strong>Chi tiết:</strong></p>
-                                                <ul>
-                                                    {record.rows.map((row, idx) => (
-                                                        <li key={idx}>
-                                                            {row.name} - {row.type} - {row.quantity}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </li>
-                                        ))
-                                    )}
-                                </ul>
-                                <div className="mt-4 flex justify-end">
-                                    <button 
-                                        onClick={() => setIsModalOpen(false)} 
-                                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                                    >
-                                        Đóng
-                                    </button>
-                                </div>
+                            <div
+                                className="cursor-pointer text-blue-600 hover:underline"
+                                onClick={() => {
+                                    localStorage.setItem('farmName', farm.farmName); // Lưu farmName vào localStorage
+                                    navigate('/dashboard');
+                                }}
+                            >
+                                <span className="font-semibold">{farm.farmName}</span> - {farm.address}
                             </div>
-                        </div>
-                    )}
-                </div>
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                                onClick={() => handleDeleteFarm(farm.farmName)}
+                            >
+                                Xóa
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+
+
             </div>
-        </>
+
+            {/* Hiển thị loading */}
+            {isLoading && <Loading />}
+
+            {/* ToastContainer */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                pauseOnHover
+            />
+        </div>
     );
 }
 

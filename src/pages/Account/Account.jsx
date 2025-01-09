@@ -23,7 +23,6 @@ function Account() {
     const username = localStorage.getItem("username");
 
     if (token && username) {
-      // Tự động chuyển hướng đến dashboard nếu đã đăng nhập
       navigate("/dashboard");
     }
   }, [navigate]);
@@ -33,7 +32,7 @@ function Account() {
     if (!isLoginEnabled) return;
 
     setIsLoading(true);
-    setErrorMessage(""); // Xóa thông báo lỗi trước khi bắt đầu đăng nhập
+    setErrorMessage(""); 
 
     const loginData = {
       username: username.trim(),
@@ -52,7 +51,7 @@ function Account() {
           localStorage.setItem("username", loginData.username);
 
           // Chuyển hướng sang dashboard
-          navigate("/dashboard");
+          navigate("/food");
         } else {
           setErrorMessage("Tài khoản hoặc mật khẩu không đúng!"); // Thông báo lỗi
         }
