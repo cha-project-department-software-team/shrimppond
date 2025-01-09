@@ -19,6 +19,9 @@ function HarvestForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
+    const farmName = localStorage.getItem('farmName') || '';
+    const username = localStorage.getItem('username') || '';
+
     const dateInputRef = useRef(null);
     const callApi = useCallApi();
     const location = useLocation();
@@ -50,12 +53,21 @@ function HarvestForm() {
     const fetchData = useCallback(() => {
         callApi(
             [
-                DashboardRequestApi.pondRequest.getPondRequestByStatus(1),
+                DashboardRequestApi.pondRequest.getPondRequestByStatus(username, farmName, 1),
             ],
             (res) => {
-                setPonds(res[0]);
+                if (res && res[0]) {
+                    setPonds(res[0]);
+                } else {
+                    setPonds([]); // Đặt giá trị mặc định là mảng rỗng nếu không có dữ liệu
+                }
             },
+            (err) => {
+                console.error("Lỗi khi lấy dữ liệu ao:", err);
+                setPonds([]); // Xử lý lỗi bằng cách đặt giá trị mặc định
+            }
         );
+        
     }, [callApi]);
 
     useEffect(() => {
