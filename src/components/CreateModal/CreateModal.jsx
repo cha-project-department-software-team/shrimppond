@@ -22,8 +22,11 @@ function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) {
     // Hàm xử lý khi người dùng nhập dữ liệu vào
     const handleInputChange = (setter) => (e) => {
         setter(e.target.value);
-        setErrorMessage(''); // Xóa lỗi khi người dùng nhập lại
+        setErrorMessage(''); 
     };
+
+    const farmName = localStorage.getItem('farmName') || '';
+    const username = localStorage.getItem('username') || '';
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -31,9 +34,10 @@ function CreateModal({ setIsCreateModal, onPostSuccess, pondTypeName }) {
         if (pondId.trim() && deep > 0 && diameter > 0) {
             const data = {
                 pondId: pondId.trim(),
-                pondTypeName: pondTypeName,
-                deep: parseFloat(deep), // Đảm bảo giá trị số được gửi
-                diameter: parseFloat(diameter) // Đảm bảo giá trị số được gửi
+                pondTypeName: pondTypeName.trim(),
+                deep: parseFloat(deep), 
+                diameter: parseFloat(diameter),
+                farmName: farmName.trim()
             };
             
             setIsLoading(true); // Hiển thị trạng thái loading

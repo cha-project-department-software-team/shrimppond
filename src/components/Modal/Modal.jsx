@@ -34,9 +34,9 @@ function Modal({  setIsModal, onPostSuccess }) {
      
         if (blockName.trim()) {
             const data = {
-                pondTypeId: generateRandomId(), // Sinh ra chuỗi ký tự ngẫu nhiên
-                pondTypeName: blockName.trim(), // Tên khối từ input
-                farmName: farmName
+                pondTypeId: generateRandomId(),
+                pondTypeName: blockName.trim(), 
+                farmName: farmName.trim()
             };
             
             setIsLoading(true); // Hiển thị trạng thái loading
