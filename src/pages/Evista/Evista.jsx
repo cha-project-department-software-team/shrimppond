@@ -60,8 +60,11 @@ function Evista() {
     if (selectedPondType) fetchPonds();
   }, [selectedPondType]);
 
+  const farmName = localStorage.getItem('farmName') || '';
+  const username = localStorage.getItem('username') || '';
+
   const fetchPondTypes = async () => {
-    const url = 'https://shrimppond.runasp.net/api/PondType?pageSize=200&pageNumber=1';
+    const url = `https://shrimppond.runasp.net/api/PondType?farmName=${farmName}&pageSize=200&pageNumber=1`;
     try {
       const response = await axios.get(url);
       setPondTypes(
