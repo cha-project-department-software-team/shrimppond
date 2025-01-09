@@ -72,7 +72,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col transition-all rounded-xl max-w-48 relative w-[170px]">
+      <div className="flex-1 flex flex-col transition-all rounded-xl max-w-36 relative w-[170px]">
         <div className={cl("flex justify-between w-full rounded-t-lg border border-black", {
           "bg-[#00A9EA]": status,
           "bg-gray-400" : !status
