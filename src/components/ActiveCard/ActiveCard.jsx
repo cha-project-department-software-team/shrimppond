@@ -141,13 +141,15 @@ function ActiveCard({ pondId, setIsActiveModal, onDeleteCardSuccess }) {
                         />
                     </div>
 
-                    {/* SelectField for Origin Pond ID */}
                     <SelectField
                         label="Mã Ao gốc"
                         id="originPondId"
                         value={originPondId}
                         onChange={handleInputChange(setOriginPondId)}
-                        options={pondOptions} // Use the pondOptions state
+                        options={[
+                            { value: '', label: 'Không có' },
+                            ...pondOptions,
+                        ]}
                     />
 
                     <FileInputField

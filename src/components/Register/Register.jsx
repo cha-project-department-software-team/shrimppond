@@ -45,38 +45,38 @@ function Register({ setIsRegister, onRegisterSuccess }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
         if (!isEmailValid(email)) {
             setErrorMessage('Email không hợp lệ.');
             return;
         }
-
+    
         if (!isPasswordValid(password)) {
             setErrorMessage('Mật khẩu phải chứa ít nhất 1 chữ cái in hoa, 1 số và 1 ký tự đặc biệt.');
             return;
         }
-
+    
         if (password !== confirmPassword) {
             setErrorMessage('Mật khẩu nhập lại không khớp.');
             return;
         }
-
+    
         if (username.trim() && email.trim() && password.trim()) {
             const data = {
                 username: username.trim(),
                 email: email.trim(),
                 password: password.trim(),
             };
-
+    
             setIsLoading(true);
-
+    
             // Gọi API đăng ký
             callApi(
                 () => DashboardRequestApi.authRequest.register(data),
                 (res) => {
                     setIsLoading(false);
-                    onRegisterSuccess();
-                    setIsRegister(false);
+                    onRegisterSuccess(); // Thông báo thành công
+                    setIsRegister(false); // Đóng modal
                     setUsername('');
                     setEmail('');
                     setPassword('');
@@ -85,7 +85,15 @@ function Register({ setIsRegister, onRegisterSuccess }) {
                 'Đăng ký thành công!',
                 (err) => {
                     setIsLoading(false);
-                    setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!');
+    
+                    // Kiểm tra lỗi từ server
+                    if (err?.response?.data && Array.isArray(err.response.data)) {
+                        const apiError = err.response.data[0]; // Lấy lỗi đầu tiên
+                        setErrorMessage(apiError.description || 'Đã có lỗi xảy ra!');
+                    } else {
+                        setErrorMessage('Đã có lỗi xảy ra, vui lòng thử lại!');
+                    }
+    
                     console.error('Error:', err);
                 }
             );
@@ -93,6 +101,7 @@ function Register({ setIsRegister, onRegisterSuccess }) {
             setErrorMessage('Tài khoản, email và mật khẩu không được để trống!');
         }
     };
+    
 
     return (
         <div 

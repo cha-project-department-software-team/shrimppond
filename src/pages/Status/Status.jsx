@@ -1,183 +1,199 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer và toast từ react-toastify
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer và toast
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS cho react-toastify
+import Loading from '../../components/Loading';
+import useCallApi from '../../hooks/useCallApi';
+import { FarmRequestApi } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
-function StatusPage() {
+function Status() {
+    const [farms, setFarms] = useState([]); // Danh sách trang trại
+    const [farmName, setFarmName] = useState(''); // Tên trang trại
+    const [farmAddress, setFarmAddress] = useState(''); // Địa chỉ trang trại
+    const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
+
+    const callApi = useCallApi();
     const navigate = useNavigate();
-    const [farms, setFarms] = useState([]);
-    const [farmName, setFarmName] = useState('');
-    const [farmAddress, setFarmAddress] = useState('');
-    const [loading, setLoading] = useState(false); // Loading state
-    const [username, setUsername] = useState(''); // Username từ localStorage
 
-    // Lấy username từ localStorage khi trang tải
-    useEffect(() => {
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername);
-        } else {
-            // Nếu không có username trong localStorage, chuyển hướng về trang login
-            toast.error('Vui lòng đăng nhập lại!');
-            navigate('/login');
-        }
-    }, [navigate]);
+    const username = localStorage.getItem('username');
 
-    // Gọi API để lấy danh sách trang trại
-    const fetchFarms = async () => {
-        if (!username) return; // Không gọi API nếu username chưa được set
+    const handleDeleteFarm = useCallback(
+        (farmName) => {
+            if (!window.confirm('Bạn có chắc chắn muốn xóa trang trại này?')) {
+                return;
+            }
+    
+            setIsLoading(true);
+            console.log(farmName)
 
-        setLoading(true); // Start loading
-        const url = `http://shrimppond.runasp.net/api/Farm?userName=${username}&pageSize=200&pageNumber=1`;
-        console.log(username)
-        try {
-            const response = await axios.get(url);
-            const farmData = response.data.map((farm, index) => ({
-                id: index + 1, // Hoặc bạn có thể sử dụng farm.id nếu có
-                name: farm.farmName,
-                address: farm.address
-            }));
-            setFarms(farmData);
-        } catch (error) {
-            console.error('Failed to fetch farms:', error);
-            toast.error('Không thể tải dữ liệu trang trại. Vui lòng thử lại.');
-        } finally {
-            setLoading(false); // End loading
-        }
-    };
+            callApi(
+                [FarmRequestApi.farmRequest.deleteFarm(username ,farmName)],
+                () => {
+                    setIsLoading(false);
+                    toast.success('Xóa trang trại thành công!');
+                    setFarms(farms.filter((farm) => farm.farmName !== farmName));
+                },
+                (err) => {
+                    setIsLoading(false);
+                    if (err?.response?.data?.title === 'PondType is still exits in Farm') {
+                        toast.error('Vẫn còn khối ao ở farm!'); // Thông báo lỗi cụ thể
+                    } else {
+                        toast.error('Có lỗi xảy ra khi xóa trang trại!');
+                    }
+                    console.error(err);
+                }
+            );
+        },
+        [callApi, farms]
+    );
+    
+    
 
-    useEffect(() => {
-        fetchFarms(); // Lấy danh sách trang trại khi username có sẵn
-    }, [username]);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (!farmName || !farmAddress) {
-            toast.error('Vui lòng nhập cả tên và địa chỉ trang trại.');
+    const fetchFarms = useCallback(() => {
+        if (!username) {
+            toast.error('Không tìm thấy thông tin người dùng!');
             return;
         }
 
-        addFarm();
-    };
+        callApi(
+            [
+                FarmRequestApi.farmRequest.getAllFarmByUserName(username),
+            ],
+            (res) => {
+                setFarms(res[0].flat());
+            },
+            (err) => {
+                toast.error('Không thể tải danh sách trang trại!');
+                console.error(err);
+            }
+        );
+    }, [callApi, username]);
 
-    const addFarm = async () => {
-        const newFarm = { farmName, address: farmAddress };
+    const handleAddFarm = useCallback(
+        (e) => {
+            e.preventDefault();
 
-        try {
-            setLoading(true); // Start loading when adding farm
+            if (!farmName.trim() || !farmAddress.trim()) {
+                toast.error('Tên trang trại và địa chỉ không được để trống!');
+                return;
+            }
 
-            const response = await axios.post('https://shrimppond.runasp.net/api/Farm', {
-                ...newFarm,
-                userName: username, // Đính kèm username vào API
-            });
+            const data = {
+                farmName: farmName.trim(),
+                address: farmAddress.trim(),
+                username, 
+            };
+            console.log(data)
 
-            // Sau khi thêm trang trại thành công, tải lại danh sách trang trại
-            fetchFarms();
+            setIsLoading(true);
 
-            setFarmName('');
-            setFarmAddress('');
-            toast.success('Thêm trang trại thành công!');
-        } catch (error) {
-            console.error('Failed to add farm:', error);
-            toast.error('Không thể thêm trang trại. Vui lòng thử lại.');
-        } finally {
-            setLoading(false); // End loading
-        }
-    };
+            callApi(
+                [
+                    FarmRequestApi.farmRequest.createFarm(data),
+                ],
+                (res) => {
+                    setIsLoading(false);
+                    toast.success('Thêm trang trại thành công!');
+                    setFarms([...farms, res[0]]); // Thêm trang trại mới vào danh sách
+                    setFarmName(''); // Reset tên trang trại
+                    setFarmAddress(''); // Reset địa chỉ
+                },
+                (err) => {
+                    setIsLoading(false);
+                    toast.error('Có lỗi xảy ra khi thêm trang trại!');
+                    console.error(err);
+                }
+            );
+        },
+        [farmName, farmAddress, farms, username, callApi]
+    );
 
-    const deleteFarm = async (farmName) => {
-        try {
-            setLoading(true); // Start loading when deleting farm
-            await axios.delete(`https://shrimppond.runasp.net/api/Farm?FarmName=${encodeURIComponent(farmName)}&userName=${username}`);
-
-            // Cập nhật lại danh sách farms sau khi xóa thành công
-            fetchFarms();
-
-            toast.success('Xóa trang trại thành công!');
-        } catch (error) {
-            console.error('Failed to delete farm:', error);
-            toast.error('Không thể xóa trang trại. Vui lòng thử lại.');
-        } finally {
-            setLoading(false); // End loading
-        }
-    };
-
-    // Hàm xử lý khi click vào một trang trại
-    const handleFarmClick = () => {
-        navigate('/'); // Chuyển hướng đến trang dashboard
-    };
+    useEffect(() => {
+        fetchFarms();
+    }, [fetchFarms]);
 
     return (
-        <div className="flex h-screen">
-            <Sidebar />
-            <div className="flex-grow flex flex-col items-center justify-start p-10">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl space-y-6">
-                    <h1 className="text-lg font-bold mb-4">Thông tin trang trại</h1>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <label className="block text-sm font-medium text-gray-700">
+        <div className="flex max-h-screen">
+            {/* Sidebar */}
+            <aside>
+                <Sidebar />
+            </aside>
+
+            <div className="flex-1 p-6">
+                <h1 className="text-2xl font-bold mb-6">Thông tin trang trại</h1>
+
+                {/* Form thêm trang trại */}
+                <form onSubmit={handleAddFarm} className="mb-6">
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2" htmlFor="farmName">
                             Trang trại
                         </label>
                         <input
+                            id="farmName"
                             type="text"
                             value={farmName}
                             onChange={(e) => setFarmName(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="Tên trang trại"
-                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
                         />
-                        <label className="block text-sm font-medium text-gray-700">
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2" htmlFor="farmAddress">
                             Địa chỉ
                         </label>
                         <input
+                            id="farmAddress"
                             type="text"
                             value={farmAddress}
                             onChange={(e) => setFarmAddress(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="Địa chỉ trang trại"
-                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
                         />
-                        <button
-                            type="submit"
-                            className="w-full px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                        >
-                            Thêm trang trại
-                        </button>
-                    </form>
+                    </div>
 
-                    {loading ? (
-                        <div className="flex justify-center items-center space-x-2">
-                            <div className="w-8 h-8 border-4 border-t-4 border-gray-200 border-solid rounded-full animate-spin border-t-blue-500"></div>
-                            <p className="text-lg text-gray-500">Loading data...</p>
-                        </div>
-                    ) : (
-                        <div>
-                            <h2 className="text-lg font-semibold">Danh sách trang trại</h2>
-                            <div className="max-h-56 overflow-y-auto divide-y divide-gray-200">
-                                {farms.map(farm => (
-                                    <div key={farm.id} className="flex justify-between items-center p-2">
-                                        <span
-                                            className="cursor-pointer text-blue-500 hover:underline"
-                                            onClick={handleFarmClick}
-                                        >
-                                            {farm.name} - {farm.address}
-                                        </span>
-                                        <button
-                                            className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                                            onClick={() => deleteFarm(farm.name)}
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                ))}
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
+                    >
+                        Thêm trang trại
+                    </button>
+                </form>
+
+                <h2 className="text-lg font-bold mb-4">Danh sách trang trại</h2>
+                <ul className="list-none space-y-4">
+                    {farms.map((farm, index) => (
+                        <li
+                            key={index}
+                            className="flex justify-between items-center p-4 bg-white shadow-md rounded-lg hover:shadow-lg"
+                        >
+                            <div
+                                className="cursor-pointer text-blue-600 hover:underline"
+                                onClick={() => {
+                                    localStorage.setItem('farmName', farm.farmName); // Lưu farmName vào localStorage
+                                    navigate('/dashboard');
+                                }}
+                            >
+                                <span className="font-semibold">{farm.farmName}</span> - {farm.address}
                             </div>
-                        </div>
-                    )}
-                </div>
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+                                onClick={() => handleDeleteFarm(farm.farmName)}
+                            >
+                                Xóa
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+
+
             </div>
 
+            {/* Hiển thị loading */}
+            {isLoading && <Loading />}
+
+            {/* ToastContainer */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -190,4 +206,4 @@ function StatusPage() {
     );
 }
 
-export default StatusPage;
+export default Status;

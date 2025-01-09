@@ -244,7 +244,7 @@ function Access() {
                   };
                 
                   // Lấy MIME type tương ứng
-                  const mimeType = mimeTypes[fileType] || "application/pdf";
+                  const mimeType = mimeTypes[fileType]
                 
                   return (
                     <div key={index} className="mb-1">
