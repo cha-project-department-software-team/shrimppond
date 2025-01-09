@@ -26,6 +26,9 @@ function Modal({  setIsModal, onPostSuccess }) {
         setErrorMessage(''); // Xóa thông báo lỗi khi người dùng nhập lại
     };
 
+    const farmName = localStorage.getItem('farmName') || '';
+    const username = localStorage.getItem('username') || '';
+
     const handleSubmit = (e) => {
         e.preventDefault();
      
@@ -33,7 +36,7 @@ function Modal({  setIsModal, onPostSuccess }) {
             const data = {
                 pondTypeId: generateRandomId(), // Sinh ra chuỗi ký tự ngẫu nhiên
                 pondTypeName: blockName.trim(), // Tên khối từ input
-                farmName: "fablab"
+                farmName: farmName
             };
             
             setIsLoading(true); // Hiển thị trạng thái loading
